@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.math.r</groupId>
+	<artifactId>drools</artifactId>
+	<version>1.0.2</version>
+	<name>Rdrools</name>
+	<description>An R package to execute drools rules</description>
+	
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>**/*</exclude>
+				</excludes>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+		
+		<plugins>
+			<!-- Compiler to use -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.1</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+	
+			<!-- Allows cross platform compatibility through UTF-8 -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.2</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/build/Rdroolsjars/inst/java</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>ant-cleanup-old-build</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<delete dir="${basedir}/build" />
+								<mkdir dir="${basedir}/build" />
+								<echo>copying the Rdrools folder.</echo>
+								<copy todir="${basedir}/build">
+									<fileset dir="${basedir}/src/main/resources" />
+								</copy>
+							</tasks>
+						</configuration>
+					</execution>
+					<execution>
+						<id>ant-build-packages</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<echo>Copying the build to Rdrools..</echo>
+								<copy todir="${basedir}/build/Rdrools/inst/java">
+									<fileset dir="${basedir}/target"
+											includes="*.jar" />
+								</copy>
+								<echo>Deleting unwanted jars</echo>
+								<delete>
+									<fileset dir="${basedir}/build/Rdroolsjars/inst/java/"
+										includes="junit*" />
+									<fileset dir="${basedir}/build/Rdroolsjars/inst/java/"
+										includes="hamcrest*" />
+								</delete>
+								<echo>Building the Rdroolsjars package</echo>
+								<exec dir="${basedir}/build" executable="/bin/sh">
+									<arg value="-c" />
+									<arg value="R CMD build Rdroolsjars" />
+								</exec>
+								<echo>Building the Rdrools package</echo>
+								<exec dir="${basedir}/build" executable="/bin/sh">
+									<arg value="-c" />
+									<arg value="R CMD build Rdrools" />
+								</exec>
+								
+								<echo>Installing the Rdroolsjars package....</echo>
+		 							<exec dir="${basedir}/build" executable="/bin/sh">
+									<arg value="-c" />
+									<arg value="R CMD INSTALL Rdroolsjars_1.0.1.tar.gz" />
+								</exec>
+								<echo>Installing the Rdrools package....</echo>
+								<exec dir="${basedir}/build" executable="/bin/sh">
+									<arg value="-c" />
+									<arg value="R CMD INSTALL Rdrools_1.0.2.tar.gz" />
+								</exec>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-compiler</artifactId>
+			<version>6.5.0.Final</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-core</artifactId>
+			<version>6.5.0.Final</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-csv</artifactId>
+		    <version>1.4</version>
+		</dependency>		
+				
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+		</dependency>
+	</dependencies>
+</project>

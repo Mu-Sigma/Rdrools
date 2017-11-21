@@ -1,0 +1,5 @@
+import('rJava')
+import('Rdroolsjars')
+importFrom('utils', 'read.csv', 'write.csv')
+export('rulesSession')
+export('runRules')

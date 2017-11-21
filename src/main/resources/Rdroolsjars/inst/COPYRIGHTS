@@ -1,0 +1,117 @@
+The package 'rdroolsjars' includes other open source software
+components. The following is a list of these components:
+
+** Drools Compiler
+
+   Copyright 2015 Red Hat, Inc. and/or its affiliates
+
+   Source: https://mvnrepository.com/artifact/org.drools/drools-compiler/6.5.0.Final
+   License Information: (Apache License 2.0) http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Related files: inst/java/drools-compiler-6.5.0.Final.jar
+
+** Drools Core
+
+   Copyright 2015 Red Hat, Inc. and/or its affiliates
+
+   Source: https://mvnrepository.com/artifact/org.drools/drools-core/6.5.0.Final
+   License Information: (Apache License 2.0) http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Related files: inst/java/drools-core-6.5.0.Final.jar
+
+** KIE::Public API
+
+   Copyright 2015 Red Hat, Inc. and/or its affiliates
+
+   Source: https://mvnrepository.com/artifact/org.kie/kie-api/6.5.0.Final
+   License Information: (Apache License 2.0) http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Related files: inst/java/kie-api-6.5.0.Final.jar
+
+** KIE::Internal
+
+   Copyright 2015 Red Hat, Inc. and/or its affiliates
+
+   Source: https://mvnrepository.com/artifact/org.kie/kie-internal/6.5.0.Final
+   License Information: (Apache License 2.0) http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Related files: inst/java/kie-internal-6.5.0.Final.jar
+
+** Apache Commons CSV
+
+   Copyright (c) 2016 The Apache Software Foundation. All Rights Reserved
+
+   Source: https://mvnrepository.com/artifact/org.apache.commons/commons-csv/1.4
+   License Information: (Apache License 2.0) http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Related files: inst/java/commons-csv-1.4.jar
+
+
+The following libraries are the dependencies that are required by the above listed sources, and as a result, have been included here.
+
+** ANTLR 3 Runtime
+
+   Copyright (c) 2010 Terence Parr. All rights reserved
+
+   Source: https://mvnrepository.com/artifact/org.antlr/antlr-runtime/3.5.2
+   License Information: (BSD License) http://www.antlr.org/license.html
+
+   Related files: inst/java/antlr-runtime-3.5.jar
+
+** Apache Commons Codec
+
+   Copyright 2009-2012 The Apache Software Foundation
+
+   Source: https://mvnrepository.com/artifact/commons-codec/commons-codec/1.4
+   License Information: (Apache License 2.0) http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Related files: inst/java/commons-codec-1.4.jar
+
+** Eclipse ECJ
+
+   Copyright (c) 2017 The Eclipse Foundation. All Rights Reserved
+
+   Source: https://mvnrepository.com/artifact/org.eclipse.jdt.core.compiler/ecj/4.4.2
+   License Information: (EPL) http://www.eclipse.org/org/documents/epl-v10.php
+
+   Related files:  inst/java/joptsimple
+
+** Protocol Buffers [Core]
+
+   Copyright 2008 Google Inc.
+
+   Source: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.6.0
+   License Information: (Apache License 2.0) http://www.apache.org/licenses/LICENSE-2.0.txt
+                        (BSD License) https://opensource.org/licenses/bsd-license.php
+
+   Related files: inst/java/protobuf-java-2.6.0.jar
+
+** MVEL
+
+   Copyright (C) 2007 The Codehaus
+               Mike Brock, Dhanji Prasanna, John Graham, Mark Proctor
+
+   Source: https://mvnrepository.com/artifact/org.mvel/mvel2/2.2.8.Final
+   License Information: (Apache License 2.0) http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Related files:  inst/java/mvel2-2.2.8.Final.jar
+
+** SLF4J API Module 
+
+   Copyright (c) 2004-2017 QOS.ch
+
+   Source: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.2
+   License Information: (MIT License) http://www.opensource.org/licenses/mit-license.php
+
+   Related files:  inst/java/slf4j-api-1.7.2.jar
+
+** XStream Core
+
+   Copyright (c) 2003-2006, Joe Walnes
+   Copyright (c) 2006-2015 XStream Committers
+   All rights reserved
+
+   Source: https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream/1.4.9
+   License Information: (BSD License) http://x-stream.github.io/license.html
+
+   Related files:  inst/java/xstream-1.4.9.jar

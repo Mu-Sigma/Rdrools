@@ -1,0 +1,26 @@
+import java.util.HashMap;
+global java.util.HashMap output;
+
+rule "rule pass"
+	salience 2
+	when
+		input : HashMap( this["grade"] >= 50 )
+	then
+//		System.out.println("in rule..."+input);
+		output.put("address", "" + input.get("email"));
+		output.put("subject", "Your grade in " + input.get("class"));
+		output.put("body", "You passed with a " + input.get("grade") + " in " + input.get("class") + ", " + input.get("name"));
+//		System.out.println("in rule..."+output);
+end
+
+rule "rule fail"
+	salience 1
+	when
+		input : HashMap( this["grade"] < 50 )
+	then
+//		System.out.println("in rule..."+input);
+		output.put("address", "" + input.get("email"));
+		output.put("subject", "Your grade in " + input.get("class"));
+		output.put("body", "You failed with a " + input.get("grade") + " in " + input.get("class") + ", " + input.get("name"));
+//		System.out.println("in rule..."+output);
+end

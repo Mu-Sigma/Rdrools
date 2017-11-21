@@ -1,0 +1,31 @@
+The following are the sources that are being used directly by this package.
+
+** Drools 6.5.0.Final:
+	Source code: https://github.com/kiegroup/drools/tree/6.5.x
+
+** Apache Commons CSV:
+	Source code: https://github.com/apache/commons-csv
+
+
+The following are the sources that are added to the package because they are dependencies for the above two packages.
+
+** ANTLR 3 Runtime
+	Source code: https://github.com/antlr/antlr3
+
+** Apache Commons Codec
+	Source Code: https://github.com/apache/commons-codec
+
+** Eclipse ECJ
+	Source Code: https://github.com/eclipse/eclipse.jdt.core
+
+** Protocol Buffers [Core]
+	Source Code: https://github.com/google/protobuf/tree/master/java
+
+** MVEL
+	Source Code: https://github.com/mvel/mvel
+
+** SLF4J API Module
+	Source Code: https://github.com/qos-ch/slf4j
+
+** XStream Code
+	Source Code: https://github.com/x-stream/xstream
