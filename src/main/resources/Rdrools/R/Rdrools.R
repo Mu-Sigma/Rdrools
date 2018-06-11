@@ -45,18 +45,14 @@ runRules<-function(rules.session,input.df) {
 #' @description: This function is used to convert the rules data uploaded into required format
 #'               
 #' -----------------------------------------------------------------------------
-#' @param sampleData rules defined in a csv file
-#' @param sampleRules dataframe 
+#' @param dataset rules defined in a csv file
+#' @param rules dataframe 
 #' -----------------------------------------------------------------------------
 #' @return rules in required format, input columns and output columns
 #' 
 convertRules <- function(dataset,rules){
   
-  dataset <- dataset
-  rules <- rules
   rulesList <- list()
-  input.columns <- colnames(dataset)
-  output.columns <-  c(input.columns)
   outputCols <- list()
   # Getting the required format to display output columns
   outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x, "',input.get('",x,"'));"))
@@ -164,15 +160,35 @@ convertRules <- function(dataset,rules){
     }
     
     drlRules[length(drlRules)+1] <-'end'
-    j<- ncol(dataset)
-    #adding each column for each rule
-    output.columns[j+i] <- paste0("Rule",i)
     rulesList[[i]] <- drlRules
     ruleList <- unlist(rulesList,recursive = FALSE)
     
     
-    }
-      ) 
+  }
+  ) 
   
   
+}
+
+
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to get the required input and output columns
+#'               
+#' -----------------------------------------------------------------------------
+#' @param dataset rules defined in a csv file
+#' @param rules dataframe 
+#' -----------------------------------------------------------------------------
+#' @return required input columns and output columns
+#' 
+getrequiredColumns <- function(dataset,rules){
+  input.columns <- colnames(dataset)
+  output.columns <-list()
+  j<- ncol(dataset)
+  #adding each column for each rule
+  output.columns<-lapply(1:nrow(rules), function(i){
+    output.columns[j+i] <- paste0("Rule",i)
+    
+  })
+  output.columns <- unlist(append(input.columns,output.columns))
+  return(list(input.columns,output.columns))
 }
