@@ -16,141 +16,124 @@
 # under the License.
 
 .onLoad <- function(libname, pkgname) {
-	.jpackage(pkgname, lib.loc = libname)
+  .jpackage(pkgname, lib.loc = libname)
 }
 
 rulesSession<-function(rules,input.columns, output.columns) {
-	rules <- paste(rules, collapse='\n')
-	input.columns <- paste(input.columns,collapse=',')
-	output.columns <- paste(output.columns,collapse=',')
-	droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
-	return(droolsSession)
+  rules <- paste(rules, collapse='\n')
+  input.columns <- paste(input.columns,collapse=',')
+  output.columns <- paste(output.columns,collapse=',')
+  droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
+  return(droolsSession)
 }
 
 runRules<-function(rules.session,input.df) {
-	conn<-textConnection('input.csv.string','w')
-	write.csv(input.df,file=conn)
-	close(conn)
-	input.csv.string <- paste(input.csv.string, collapse='\n')
-	output.csv.string <- .jcall(rules.session, 'S', 'execute',input.csv.string)
-	conn <- textConnection(output.csv.string, 'r')
-	output.df<-read.csv(file=conn, header=T)
-	close(conn)
-	return(output.df)
+  conn<-textConnection('input.csv.string','w')
+  write.csv(input.df,file=conn)
+  close(conn)
+  input.csv.string <- paste(input.csv.string, collapse='\n')
+  output.csv.string <- .jcall(rules.session, 'S', 'execute',input.csv.string)
+  conn <- textConnection(output.csv.string, 'r')
+  output.df<-read.csv(file=conn, header=T)
+  close(conn)
+  return(output.df)
 }
+
 
 
 #' -----------------------------------------------------------------------------
 #' @description: This function is used to convert the rules data uploaded into required format
 #'               
 #' -----------------------------------------------------------------------------
-#' @param dataset rules defined in a csv file
-#' @param rules dataframe 
+#' @param sampleData rules defined in a csv file
+#' @param sampleRules dataframe 
 #' -----------------------------------------------------------------------------
 #' @return rules in required format, input columns and output columns
 #' 
-convertRules <- function(dataset, rules){
+convertRules <- function(sampleData,sampleRules){
   
   sampleData <- sampleData
-  
   sampleRules <- sampleRules
   rulesList <- list()
   input.columns <- colnames(sampleData)
-  
   output.columns <-  c(input.columns)
   outputCols <- list()
   # Getting the required format to display output columns
-  for(k in 1:ncol(sampleData)){
-    outputCols[k] <- paste0("output.put('",colnames(sampleData)[k], "',input.get('",colnames(sampleData)[k],"'));")
-    
-  }
+  outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x, "',input.get('",x,"'));"))
   
-  for(i in 1:nrow(sampleRules)){
+  # Running the loop to get drl format for all the rules
+  
+  map(1:nrow(rules), function(i){
     
-    variables  <- getVariables(sampleRules)
-    filterData <- variables[[i]][1]
     
-    groupbyColumn  <- variables[[i]][2]
-    aggregateCoulmn <- variables[[i]][3]
+    filterData <- rules[i,"Filters"]
+    groupbyColumn  <- rules[i,"GroupBy"]
+    aggregateCoulmn <- rules[i,"Column"]
+    aggregationFunc <-noquote( rules[i,"Function"])
+    operation <-  rules[i,"Operation"]
+    argument <- rules[i,"Argument"]
     
-    aggregationFunc <-noquote( variables[[i]][4])
-    operation <- variables[[i]][5]
-    argument <- variables[[i]][6]
-    print(aggregationFunc)
-    print(groupbyColumn)
     # checking if there are more than one group by
-    if(unlist(gregexpr(pattern =',',variables[[i]][2]))!=-1 && variables[[i]][2]!=""){
+    if(unlist(gregexpr(pattern =',',groupbyColumn))!=-1 && groupbyColumn!=""){
       
-      n <- length(unlist(gregexpr(pattern =',',variables[[i]][2])))
+      n <- length(unlist(gregexpr(pattern =',',groupbyColumn)))
       groupbyCondition <- list()
-      
-      
-      for(j in 0:n){
+      map(groupbyColumn,function(groupbyColumn){
         #making groupby condition if there are multiple groupby
         groupbyColumn <- unlist(strsplit(unlist(groupbyColumn),","))
-        groupbyCondition[j+1] <- paste0(groupbyColumn[j+1],'==input.get("',groupbyColumn[j+1],'")')
+        groupbyCondition <- paste0(groupbyColumn,'==input.get("',groupbyColumn,'")')
         groupbyCondition <-paste0(groupbyCondition,collapse = ",")
         
         if(filterData==""){
           #condition when there is no filter
-          print(paste0("no filter & multple group by",i))
+          
           accumulateCondition <-    paste0("result: Double()
                                            from accumulate($condition:HashMap(",groupbyCondition,"),",
                                            aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))") 
           
-          
-          
-          
         }else{
           #condition when there is filter
-          print(paste0("filter & multple group by",i))
           accumulateCondition <-  paste0("result: Double()
                                          from accumulate($condition:HashMap(",groupbyCondition,",", 
                                          filterData,"),",
                                          aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")  
         }
-      }}else if(unlist(gregexpr(pattern =',',variables[[i]][2]))==-1 && variables[[i]][2]==""){
+      })
+    }else if(unlist(gregexpr(pattern =',',groupbyColumn))==-1 &&groupbyColumn==""){
+      #No groupby  
+      if(aggregationFunc=="compare" && filterData==""){
+        #Rules having compare and no filter
         
-        print("im in elseif")
-        print(aggregationFunc)
+        accumulateCondition <- paste0('result:HashMap(Double.valueOf(this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
         
-        if(aggregationFunc=="compare" && filterData==""){
-          
-          print(paste0("no filter & no group by,compare",i))
-          accumulateCondition <- paste0('result:HashMap(Double.valueOf(this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
-          
-        }else if(aggregationFunc=="compare" && filterData!=""){
-          accumulateCondition <- paste0('result:HashMap(',filterData,',Double.valueOf( this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
-        }
-      }else{
-        
-        groupbyColumn <- groupbyColumn
-        groupbyCondition <- paste0(groupbyColumn,'==input.get("',groupbyColumn,'")')
-        #groupbyOutput <- paste0('output.put('",groupbyColumn, "',input.get('",groupbyColumn,"'));')
-        
-        
-        
-        
-        if(filterData==""){
-          print(paste0("one groupby,no fiklter"),i)
-          accumulateCondition <-    paste0("result: Double()
-                                           from accumulate($condition:HashMap(",groupbyCondition,"),",
-                                           aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")
-          
-          
-          
-          
-        }else{
-          print(paste0("one groupby, fiklter"),i)
-          accumulateCondition <- paste0("result: Double()
-                                        from accumulate($condition:HashMap(",groupbyCondition,",", 
-                                        filterData,"),",
-                                        aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")  
-        }
+      }else if(aggregationFunc=="compare" && filterData!=""){
+        #Rules having compare and filter
+        accumulateCondition <- paste0('result:HashMap(',filterData,',Double.valueOf( this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
       }
-    
-    
-    
+      
+    }else if(aggregationFunc!="compare" && filterData==""){
+      #Rules having no compare and no filter i.e. aggregation on a columns
+      accumulateCondition <-  paste0("result: Double()
+                                     from accumulate($condition:HashMap(),",
+                                     aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")
+    }else{
+      
+      groupbyColumn <- groupbyColumn
+      groupbyCondition <- paste0(groupbyColumn,'==input.get("',groupbyColumn,'")')
+      if(filterData==""){
+        accumulateCondition <-    paste0("result: Double()
+                                         from accumulate($condition:HashMap(",groupbyCondition,"),",
+                                         aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")
+        
+        
+      }else{
+        accumulateCondition <- paste0("result: Double()
+                                      from accumulate($condition:HashMap(",groupbyCondition,",", 
+                                      filterData,"),",
+                                      aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")  
+      }
+      
+    }
     
     sampleRulesListtest <-list(
       'import java.util.HashMap',
@@ -163,9 +146,6 @@ convertRules <- function(dataset, rules){
       '       salience 0',
       '       when',
       '        input: HashMap()',
-      
-      
-      
       #filtering
       
       accumulateCondition,
@@ -173,9 +153,10 @@ convertRules <- function(dataset, rules){
       'then'
       
     )    
-    for(m in outputCols){#adding the condition for displaying output columns 
-      sampleRulesListtest[length(sampleRulesListtest)+1] <- m
-    }
+    
+    #adding the condition for displaying output columns 
+    sampleRulesListtest <-  append(sampleRulesListtest, outputCols)
+    
     if(aggregationFunc=="compare"){
       sampleRulesListtest[length(sampleRulesListtest)+1] <- paste0("output.put(\"Rule",i,"\",'",aggregateCoulmn,operation,argument,"');")  
     }else{
@@ -189,10 +170,9 @@ convertRules <- function(dataset, rules){
     rulesList[[i]] <- sampleRulesListtest
     ruleList <- unlist(rulesList,recursive = FALSE)
     
-  }
+    return(list(rulesList,input.columns,output.columns))
+    }
+      ) 
   
-  return(list(rulesList,input.columns,output.columns))
+  
 }
-
-
-
