@@ -63,7 +63,7 @@ convertRules <- function(dataset,rules){
   
   # Running the loop to get drl format for all the rules
   
-  map(1:nrow(rules), function(i){
+  lapply(1:nrow(rules), function(i){
     
     
     filterData <- rules[i,"Filters"]
@@ -170,7 +170,7 @@ convertRules <- function(dataset,rules){
     rulesList[[i]] <- drlRules
     ruleList <- unlist(rulesList,recursive = FALSE)
     
-    return(list(rulesList,input.columns,output.columns))
+    
     }
       ) 
   
