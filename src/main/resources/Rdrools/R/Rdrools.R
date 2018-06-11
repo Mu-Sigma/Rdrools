@@ -50,12 +50,12 @@ runRules<-function(rules.session,input.df) {
 #' -----------------------------------------------------------------------------
 #' @return rules in required format, input columns and output columns
 #' 
-convertRules <- function(sampleData,sampleRules){
+convertRules <- function(dataset,rules){
   
-  sampleData <- sampleData
-  sampleRules <- sampleRules
+  dataset <- dataset
+  rules <- rules
   rulesList <- list()
-  input.columns <- colnames(sampleData)
+  input.columns <- colnames(dataset)
   output.columns <-  c(input.columns)
   outputCols <- list()
   # Getting the required format to display output columns
@@ -135,7 +135,7 @@ convertRules <- function(sampleData,sampleRules){
       
     }
     
-    sampleRulesListtest <-list(
+    drlRules <-list(
       'import java.util.HashMap',
       'import java.lang.Double',
       'global java.util.HashMap output',
@@ -155,19 +155,19 @@ convertRules <- function(sampleData,sampleRules){
     )    
     
     #adding the condition for displaying output columns 
-    sampleRulesListtest <-  append(sampleRulesListtest, outputCols)
+    drlRules <-  append(drlRules, outputCols)
     
     if(aggregationFunc=="compare"){
-      sampleRulesListtest[length(sampleRulesListtest)+1] <- paste0("output.put(\"Rule",i,"\",'",aggregateCoulmn,operation,argument,"');")  
+      drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",i,"\",'",aggregateCoulmn,operation,argument,"');")  
     }else{
-      sampleRulesListtest[length(sampleRulesListtest)+1] <- paste0("output.put(\"Rule",i,"\",result",operation,argument,");")      
+      drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",i,"\",result",operation,argument,");")      
     }
     
-    sampleRulesListtest[length(sampleRulesListtest)+1] <-'end'
-    j<- ncol(sampleData)
+    drlRules[length(drlRules)+1] <-'end'
+    j<- ncol(dataset)
     #adding each column for each rule
     output.columns[j+i] <- paste0("Rule",i)
-    rulesList[[i]] <- sampleRulesListtest
+    rulesList[[i]] <- drlRules
     ruleList <- unlist(rulesList,recursive = FALSE)
     
     return(list(rulesList,input.columns,output.columns))
