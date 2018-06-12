@@ -28,7 +28,7 @@
 #' @param dataset rules defined in a csv file
 #' @param rules dataframe 
 #' -----------------------------------------------------------------------------
-#' @return rules in required format, input columns and output columns
+#' @return rules in drl format, output dataframe 
 #' 
 executeRulesOnDataset <- function(dataset,rules){
   
@@ -54,7 +54,7 @@ executeRulesOnDataset <- function(dataset,rules){
       
       n <- length(unlist(gregexpr(pattern =',',groupbyColumn)))
       groupbyCondition <- list()
-      map(groupbyColumn,function(groupbyColumn){
+      accumulateCondition<-   map(groupbyColumn,function(groupbyColumn){
         #making groupby condition if there are multiple groupby
         groupbyColumn <- unlist(strsplit(unlist(groupbyColumn),","))
         groupbyCondition <- paste0(groupbyColumn,'==input.get("',groupbyColumn,'")')
@@ -141,14 +141,18 @@ executeRulesOnDataset <- function(dataset,rules){
     
     drlRules[length(drlRules)+1] <-'end'
     rulesList[[i]] <- drlRules
-    ruleList <- unlist(rulesList,recursive = FALSE)
+    allRuleList <- unlist(rulesList,recursive = FALSE)
     
     
-  }
-  return(list(rulesList,rulesList))
+    }
   
+  input.colums <- getrequiredColumns(dataset,rules)[[1]]
+  output.colums <- getrequiredColumns(dataset,rules)[[2]]
+  rules.Session <- rulesSession(unlist(rulesList),input.colums,output.colums)
+  outputDf <- runRules(rules.Session,dataset)
+  return(list(rulesList,unlist(rulesList),outputDf))
   
-}
+    }
 
 
 #' -----------------------------------------------------------------------------
