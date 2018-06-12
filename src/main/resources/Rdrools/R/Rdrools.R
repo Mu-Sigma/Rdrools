@@ -30,7 +30,7 @@
 #' -----------------------------------------------------------------------------
 #' @return rules in required format, input columns and output columns
 #' 
-convertRules <- function(dataset,rules){
+executeRulesOnDataset <- function(dataset,rules){
   
   rulesList <- list()
   outputCols <- list()
@@ -184,10 +184,10 @@ getrequiredColumns <- function(dataset,rules){
 #' @return drools session
 #' 
 
-rulesSession<-function(dataset,rules) {
+rulesSessionCsv<-function(dataset,rules) {
   
   
-  #Call getrequiredColumns and convert rules function to get rules, input and output columns
+  #Call getrequiredColumns and executeRulesOnDataset function to get rules, input and output columns
   droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
   return(droolsSession)
 }
@@ -203,7 +203,7 @@ rulesSession<-function(dataset,rules) {
 #' -----------------------------------------------------------------------------
 #' @return drools session
 #' 
-rulesSession<-function(rules,input.columns, output.columns) {
+rulesSessionDrl <- function(rules,input.columns, output.columns) {
   rules <- paste(rules, collapse='\n')
   input.columns <- paste(input.columns,collapse=',')
   output.columns <- paste(output.columns,collapse=',')
@@ -241,7 +241,7 @@ rulesSessionDT<-function(rulesDT,input.columns,output.columns){
 #' @return output dataframe
 #'
 
-runRules<-function(rules.session,input.df) {
+runRulesDrl<-function(rules.session,input.df) {
   conn<-textConnection('input.csv.string','w')
   write.csv(input.df,file=conn)
   close(conn)
