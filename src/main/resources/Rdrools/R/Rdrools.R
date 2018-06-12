@@ -179,25 +179,6 @@ getrequiredColumns <- function(dataset,rules){
 
 
 #' -----------------------------------------------------------------------------
-#' @description: This function is used to call the drools session for rules that are in csv format
-#'               
-#' -----------------------------------------------------------------------------
-#' @param dataset dataframe
-#' @param rules rules defined in a csv file
-#' -----------------------------------------------------------------------------
-#' @return drools session
-#' 
-
-rulesSessionCsv<-function(dataset,rules) {
-  
-  
-  #Call getrequiredColumns and executeRulesOnDataset function to get rules, input and output columns
-  droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
-  return(droolsSession)
-}
-
-
-#' -----------------------------------------------------------------------------
 #' @description: This function is used to call the drools session for rules that are in drl format
 #'               
 #' -----------------------------------------------------------------------------
