@@ -38,8 +38,8 @@ executeRulesOnDataset <- function(dataset,rules){
   outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x, "',input.get('",x,"'));"))
   
   # Running the loop to get drl format for all the rules
-  
-  lapply(1:nrow(rules), function(i){
+  accumulateCondition <- ""
+  for(i in 1:nrow(rules)){
     
     
     filterData <- rules[i,"Filters"]
@@ -145,7 +145,7 @@ executeRulesOnDataset <- function(dataset,rules){
     
     
   }
-  ) 
+  return(list(rulesList,rulesList))
   
   
 }
