@@ -19,26 +19,6 @@
   .jpackage(pkgname, lib.loc = libname)
 }
 
-rulesSession<-function(rules,input.columns, output.columns) {
-  rules <- paste(rules, collapse='\n')
-  input.columns <- paste(input.columns,collapse=',')
-  output.columns <- paste(output.columns,collapse=',')
-  droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
-  return(droolsSession)
-}
-
-runRules<-function(rules.session,input.df) {
-  conn<-textConnection('input.csv.string','w')
-  write.csv(input.df,file=conn)
-  close(conn)
-  input.csv.string <- paste(input.csv.string, collapse='\n')
-  output.csv.string <- .jcall(rules.session, 'S', 'execute',input.csv.string)
-  conn <- textConnection(output.csv.string, 'r')
-  output.df<-read.csv(file=conn, header=T)
-  close(conn)
-  return(output.df)
-}
-
 
 
 #' -----------------------------------------------------------------------------
@@ -191,4 +171,84 @@ getrequiredColumns <- function(dataset,rules){
   })
   output.columns <- unlist(append(input.columns,output.columns))
   return(list(input.columns,output.columns))
+}
+
+
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to call the drools session for rules that are in csv format
+#'               
+#' -----------------------------------------------------------------------------
+#' @param dataset dataframe
+#' @param rules rules defined in a csv file
+#' -----------------------------------------------------------------------------
+#' @return drools session
+#' 
+
+rulesSession<-function(dataset,rules) {
+  
+  
+  #Call getrequiredColumns and convert rules function to get rules, input and output columns
+  droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
+  return(droolsSession)
+}
+
+
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to call the drools session for rules that are in drl format
+#'               
+#' -----------------------------------------------------------------------------
+#' @param dataset rules defined in a csv file
+#' @param input.columns input columns of the dataframe
+#' @param output.columns required output columns
+#' -----------------------------------------------------------------------------
+#' @return drools session
+#' 
+rulesSession<-function(rules,input.columns, output.columns) {
+  rules <- paste(rules, collapse='\n')
+  input.columns <- paste(input.columns,collapse=',')
+  output.columns <- paste(output.columns,collapse=',')
+  droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
+  return(droolsSession)
+}
+
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to call the drools session for rules that are in decision table format
+#'               
+#' -----------------------------------------------------------------------------
+#' @param rulesDT rules defined in a decision table
+#' @param input.columns input columns of the dataframe
+#' @param output.columns required output columns
+#' -----------------------------------------------------------------------------
+#' @return drools session
+#' 
+rulesSessionDT<-function(rulesDT,input.columns,output.columns){
+  
+  
+  
+  
+  
+  
+}
+
+
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to execute all kinds of rules (defined in csv or drl or DT format)
+#'               
+#' -----------------------------------------------------------------------------
+#' @param rules.session output fo rulesSession function
+#' @param input.df input dataframe
+#' -----------------------------------------------------------------------------
+#' @return output dataframe
+#'
+
+runRules<-function(rules.session,input.df) {
+  conn<-textConnection('input.csv.string','w')
+  write.csv(input.df,file=conn)
+  close(conn)
+  input.csv.string <- paste(input.csv.string, collapse='\n')
+  output.csv.string <- .jcall(rules.session, 'S', 'execute',input.csv.string)
+  conn <- textConnection(output.csv.string, 'r')
+  output.df<-read.csv(file=conn, header=T)
+  close(conn)
+  return(output.df)
 }
