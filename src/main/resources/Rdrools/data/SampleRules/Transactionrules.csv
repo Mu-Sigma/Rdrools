@@ -1,8 +1,0 @@
-Filters,GroupBy,Column,Function,Operation,Argument,caseSensitive
-Date >  '2017-05-01' && Credit_Debit_Indicator == 'Debit',"Account_ID,Month",Transaction_Amount,sum,>=,10000,""""""
-,"Account_ID,Month",Transaction_ID,count,>,5,""""""
-,,Total_Transactions,compare,>,No_of_Transactions,
-Date >  '2017-05-01' && Credit_Debit_Indicator == 'Debit',,Total_Transactions,compare,>,No_of_Transactions,
-Date > '2017-05-01' && Credit_Debit_Indicator == 'Debit',Account_ID,Transaction_ID,min,>,5,""""""
-,Account_ID,Transaction_ID,max,>,5,""""""
-,,Transaction_Amount,mean,>,1000,
