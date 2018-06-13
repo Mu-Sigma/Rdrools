@@ -38,7 +38,7 @@ executeRulesOnDataset <- function(dataset,rules){
   outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x, "',input.get('",x,"'));"))
   
   # Running the loop to get drl format for all the rules
-  accumulateCondition <- ""
+  
   for(i in 1:nrow(rules)){
     
     
@@ -49,110 +49,117 @@ executeRulesOnDataset <- function(dataset,rules){
     operation <-  rules[i,"Operation"]
     argument <- rules[i,"Argument"]
     
-    # checking if there are more than one group by
-    if(unlist(gregexpr(pattern =',',groupbyColumn))!=-1 && groupbyColumn!=""){
+    
+    if(groupbyColumn=="" && aggregateCoulmn== "" && aggregationFunc=="" && operation=="" && argument==""){
+      ##if there is only filter without other parameters
+      drlRules <- getDrlForFilterRules(filterData,rules,outputCols,i)
       
-      n <- length(unlist(gregexpr(pattern =',',groupbyColumn)))
-      groupbyCondition <- list()
-      accumulateCondition<-   map(groupbyColumn,function(groupbyColumn){
-        #making groupby condition if there are multiple groupby
-        groupbyColumn <- unlist(strsplit(unlist(groupbyColumn),","))
-        groupbyCondition <- paste0(groupbyColumn,'==input.get("',groupbyColumn,'")')
-        groupbyCondition <-paste0(groupbyCondition,collapse = ",")
+    }else{
+      
+      # checking if there are more than one group by
+      if(unlist(gregexpr(pattern =',',groupbyColumn))!=-1 && groupbyColumn!=""){
         
-        if(filterData==""){
-          #condition when there is no filter
+        n <- length(unlist(gregexpr(pattern =',',groupbyColumn)))
+        groupbyCondition <- list()
+        accumulateCondition<-   map(groupbyColumn,function(groupbyColumn){
+          #making groupby condition if there are multiple groupby
+          groupbyColumn <- unlist(strsplit(unlist(groupbyColumn),","))
+          groupbyCondition <- paste0(groupbyColumn,'==input.get("',groupbyColumn,'")')
+          groupbyCondition <-paste0(groupbyCondition,collapse = ",")
           
+          if(filterData==""){
+            #condition when there is no filter
+            
+            accumulateCondition <-    paste0("result: Double()
+                                             from accumulate($condition:HashMap(",groupbyCondition,"),",
+                                             aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))") 
+            
+          }else{
+            #condition when there is filter
+            accumulateCondition <-  paste0("result: Double()
+                                           from accumulate($condition:HashMap(",groupbyCondition,",", 
+                                           filterData,"),",
+                                           aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")  
+          }
+        })
+      }else if(unlist(gregexpr(pattern =',',groupbyColumn))==-1 &&groupbyColumn==""){
+        #No groupby  
+        if(aggregationFunc=="compare" && filterData==""){
+          #Rules having compare and no filter
+          
+          accumulateCondition <- paste0('result:HashMap(Double.valueOf(this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
+          
+        }else if(aggregationFunc=="compare" && filterData!=""){
+          #Rules having compare and filter
+          accumulateCondition <- paste0('result:HashMap(',filterData,',Double.valueOf( this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
+        }
+        
+      }else if(aggregationFunc!="compare" && filterData==""){
+        #Rules having no compare and no filter i.e. aggregation on a columns
+        accumulateCondition <-  paste0("result: Double()
+                                       from accumulate($condition:HashMap(),",
+                                       aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")
+      }else{
+        
+        groupbyColumn <- groupbyColumn
+        groupbyCondition <- paste0(groupbyColumn,'==input.get("',groupbyColumn,'")')
+        if(filterData==""){
           accumulateCondition <-    paste0("result: Double()
                                            from accumulate($condition:HashMap(",groupbyCondition,"),",
-                                           aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))") 
+                                           aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")
+          
           
         }else{
-          #condition when there is filter
-          accumulateCondition <-  paste0("result: Double()
-                                         from accumulate($condition:HashMap(",groupbyCondition,",", 
-                                         filterData,"),",
-                                         aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")  
+          accumulateCondition <- paste0("result: Double()
+                                        from accumulate($condition:HashMap(",groupbyCondition,",", 
+                                        filterData,"),",
+                                        aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")  
         }
-      })
-    }else if(unlist(gregexpr(pattern =',',groupbyColumn))==-1 &&groupbyColumn==""){
-      #No groupby  
-      if(aggregationFunc=="compare" && filterData==""){
-        #Rules having compare and no filter
         
-        accumulateCondition <- paste0('result:HashMap(Double.valueOf(this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
-        
-      }else if(aggregationFunc=="compare" && filterData!=""){
-        #Rules having compare and filter
-        accumulateCondition <- paste0('result:HashMap(',filterData,',Double.valueOf( this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
       }
       
-    }else if(aggregationFunc!="compare" && filterData==""){
-      #Rules having no compare and no filter i.e. aggregation on a columns
-      accumulateCondition <-  paste0("result: Double()
-                                     from accumulate($condition:HashMap(),",
-                                     aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")
-    }else{
+      drlRules <-list(
+        'import java.util.HashMap',
+        'import java.lang.Double',
+        'global java.util.HashMap output',
+        "",
+        '  dialect "mvel"',
+        # Rules name
+        paste0("rule \"Rule",i,"\""),
+        '       salience 0',
+        '       when',
+        '        input: HashMap()',
+        #filtering
+        
+        accumulateCondition,
+        
+        'then'
+        
+      )    
       
-      groupbyColumn <- groupbyColumn
-      groupbyCondition <- paste0(groupbyColumn,'==input.get("',groupbyColumn,'")')
-      if(filterData==""){
-        accumulateCondition <-    paste0("result: Double()
-                                         from accumulate($condition:HashMap(",groupbyCondition,"),",
-                                         aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")
-        
-        
+      #adding the condition for displaying output columns 
+      drlRules <-  append(drlRules, outputCols)
+      
+      if(aggregationFunc=="compare"){
+        drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",i,"\",'",aggregateCoulmn,operation,argument,"');")  
       }else{
-        accumulateCondition <- paste0("result: Double()
-                                      from accumulate($condition:HashMap(",groupbyCondition,",", 
-                                      filterData,"),",
-                                      aggregationFunc,"(Double.valueOf($condition.get(",shQuote(aggregateCoulmn),").toString())))")  
+        drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",i,"\",result",operation,argument,");")      
       }
-      
     }
-    
-    drlRules <-list(
-      'import java.util.HashMap',
-      'import java.lang.Double',
-      'global java.util.HashMap output',
-      "",
-      '  dialect "mvel"',
-      # Rules name
-      paste0("rule \"Rule",i,"\""),
-      '       salience 0',
-      '       when',
-      '        input: HashMap()',
-      #filtering
-      
-      accumulateCondition,
-      
-      'then'
-      
-    )    
-    
-    #adding the condition for displaying output columns 
-    drlRules <-  append(drlRules, outputCols)
-    
-    if(aggregationFunc=="compare"){
-      drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",i,"\",'",aggregateCoulmn,operation,argument,"');")  
-    }else{
-      drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",i,"\",result",operation,argument,");")      
-    }
-    
     drlRules[length(drlRules)+1] <-'end'
     rulesList[[i]] <- drlRules
     allRuleList <- unlist(rulesList,recursive = FALSE)
     
     
-    }
+  }
   
   input.colums <- getrequiredColumns(dataset,rules)[[1]]
   output.colums <- getrequiredColumns(dataset,rules)[[2]]
   rules.Session <- rulesSession(unlist(rulesList),input.colums,output.colums)
   outputDf <- runRules(rules.Session,dataset)
-  return(list(rulesList,unlist(rulesList),outputDf))
+  return(list(rulesList,outputDf))
   
-    }
+}
 
 
 #' -----------------------------------------------------------------------------
@@ -177,6 +184,59 @@ getrequiredColumns <- function(dataset,rules){
   return(list(input.columns,output.columns))
 }
 
+
+
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to get the drl format for the rules which have only filters
+#'               
+#' -----------------------------------------------------------------------------
+#' @param filterData filter condition given
+#' @param rules rules in csv format
+#' @param outputCols the output statments to show the output
+#' @param ruleNum the rule number
+#' -----------------------------------------------------------------------------
+#' @return required drl format of the rule
+#' 
+
+
+
+getDrlForFilterRules <- function(filterData,rules,outputCols,ruleNum){
+  #this fucntion is used to create rules in drl for the rules which involve only filters
+  #this is done by creating the complementary rule for the given filter and then labelling the true/false
+  condition <- paste0("input:HashMap(",filterData,")")
+  
+  compcondition <- paste0("input:HashMap(!(",filterData,"))")
+  outputforFilter <- paste0("output.put(\"Rule",ruleNum,"\"",", \"\"+","\"true\"",");")
+  
+  outputforFilterComp <- paste0("output.put(\"Rule",ruleNum,"\"",", \"\"+","\"false\"",");")
+  
+  drlRules <-  list("import java.util.HashMap;",
+                    "global java.util.HashMap output;",
+                    "",
+                    paste0("rule \"Rule",ruleNum,"\""),
+                    "\tsalience 0",#rule priority
+                    "\twhen",
+                    condition,
+                    "\tthen")
+  drlRules <-append(drlRules,outputCols)
+  
+  compDrl<-list(
+    outputforFilter,
+    "end",
+    "",
+    "rule \"rule fail\"",
+    "\tsalience 1",
+    "\twhen",
+    compcondition, 
+    
+    "\tthen")
+  
+  drlRules <- append(drlRules,compDrl)
+  drlRules<-append(drlRules,outputCols)
+  drlRules[length(drlRules)+1] <- outputforFilterComp
+  
+  return(drlRules)
+}
 
 #' -----------------------------------------------------------------------------
 #' @description: This function is used to call the drools session for rules that are in drl format

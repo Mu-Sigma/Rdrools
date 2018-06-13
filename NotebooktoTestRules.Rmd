@@ -1,0 +1,112 @@
+---
+title: "Notebook to test rules"
+author: "Dheekshitha PS"
+date: "13 June 2018"
+output:
+  html_document:
+
+    code_folding: show
+    toc: yes
+    toc_depth: 5
+  html_notebook:
+    toc: yes
+    toc_depth: 5
+  pdf_document:
+    toc: yes
+    toc_depth: '5'
+---
+
+```{r echo = FALSE, message = FALSE, results = 'hide', warning = FALSE, error=FALSE}
+#Package installation if required for handbook
+required.packages <- c('Rdrools','DT','lubridate','purrr')
+
+for(pkg in required.packages){
+  if(!require(pkg,character.only = T)){
+    install.packages(pkg, repos = "http://cloud.r-project.org/")
+    library(pkg)
+  }
+}
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#Sourcing the required R scripts
+source(file = "./src/main/resources/Rdrools/R/Rdrools.R")
+
+
+```
+## Loading the sample data
+```{r}
+
+
+sampleData <- read.csv("./src/main/resources/Rdrools/data/SampleDataset/TransactionsData.csv",stringsAsFactors = FALSE)
+sampleData <-sampleData[1:200,]
+#coverting the data to ymd format
+sampleData$Date <- ymd(sampleData$Date)
+str(sampleData)
+```
+
+     
+```{r,echo=FALSE}
+
+datatable(
+  head(sampleData, 20), extensions = 'FixedColumns',
+  options = list(
+  dom = 't',
+  scrollX = TRUE,
+  scrollCollapse = TRUE
+))
+```
+
+
+
+## Loading the sample rules
+
+```{r}
+sampleRules <-read.csv("./src/main/resources/Rdrools/data/SampleRules/workingRules.csv",stringsAsFactors = FALSE)
+sampleRules[is.na(sampleRules)]    <-""
+```
+  
+```{r,echo=FALSE}
+
+datatable(
+  head(sampleRules, 20), extensions = 'FixedColumns',
+  options = list(
+  dom = 't',
+  scrollX = TRUE,
+  scrollCollapse = TRUE
+))
+```
+
+
+
+## Running the rules
+The function, *executeRulesOnDataset* returns two objects: 
+  
+  * rulesList: the list containing all the rules in drl format
+  * outputDf: the dataframe with all the input columns and one column for each rule (with flags true/false)
+```{r}
+output<- executeRulesOnDataset(dataset=sampleData,rules = sampleRules)
+
+```
+```{r,echo=FALSE}
+
+datatable(
+  head(output[[2]], 20), extensions = 'FixedColumns',
+  options = list(
+  dom = 't',
+  scrollX = TRUE,
+  scrollCollapse = TRUE
+))
+```
+
+
+
+-----
+
+
+## drl form for rule1
+```{r,message=NA}
+output[[1]][1]
+```
