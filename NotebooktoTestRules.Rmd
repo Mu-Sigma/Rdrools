@@ -1,7 +1,7 @@
 ---
 title: "Notebook to test rules"
 author: "Dheekshitha PS"
-date: "13 June 2018"
+date: "15 June 2018"
 output:
   html_document:
 
@@ -18,7 +18,7 @@ output:
 
 ```{r echo = FALSE, message = FALSE, results = 'hide', warning = FALSE, error=FALSE}
 #Package installation if required for handbook
-required.packages <- c('Rdrools','DT','lubridate','purrr')
+required.packages <- c('Rdrools','DT','lubridate','purrr','dplyr')
 
 for(pkg in required.packages){
   if(!require(pkg,character.only = T)){
@@ -63,6 +63,14 @@ datatable(
 
 ## Loading the sample rules
 
+
+Each rule in the below is csv is:
+Rule1: No filter, aggregation by multiple columns
+Rule2: Filter and aggregation by multiple columns
+Rule3: Filter and aggregation by one column
+Rule4: No filter and aggregation by one column
+Rule5: Only filter,no aggregation
+Rule6: NO filter, aggregation on whole column
 ```{r}
 sampleRules <-read.csv("./src/main/resources/Rdrools/data/SampleRules/workingRules.csv",stringsAsFactors = FALSE)
 sampleRules[is.na(sampleRules)]    <-""
@@ -84,13 +92,13 @@ datatable(
 ## Running the rules
 The function, *executeRulesOnDataset* returns two objects: 
   
-  * rulesList: the list containing all the rules in drl format
+  * perRule: the list containing the each rule in drl format and csv format
   * outputDf: the dataframe with all the input columns and one column for each rule (with flags true/false)
 ```{r}
 output<- executeRulesOnDataset(dataset=sampleData,rules = sampleRules)
 
 ```
-```{r,echo=FALSE}
+```{r}
 
 datatable(
   head(output[[2]], 20), extensions = 'FixedColumns',
@@ -106,7 +114,68 @@ datatable(
 -----
 
 
-## drl form for rule1
+## Rule in csv and drl format
 ```{r,message=NA}
 output[[1]][1]
+```
+
+## Output per rule
+The function, *getRuleWiseData* will give output for each rule separately. If there is *aggregation* in any of the rules, the output will have only the *groupby* column and the flag but not all the rows.
+```{r}
+eachRuleoutput <- getRuleWiseData(dataset = sampleData,outputDf = output[[2]],rules = sampleRules)
+
+```
+
+
+-----
+
+
+
+
+The below rule has two *groupby* columns
+```{r}
+
+datatable(
+  head(eachRuleoutput[[1]], 20), extensions = 'FixedColumns',
+  options = list(
+  dom = 't',
+  scrollX = TRUE,
+  scrollCollapse = TRUE
+))
+```
+
+
+
+------
+
+
+
+The below rule has *no* *groupby* columns and only filter, hence all the rows are returned
+```{r}
+
+datatable(
+  head(eachRuleoutput[[5]], 20), extensions = 'FixedColumns',
+  options = list(
+  dom = 't',
+  scrollX = TRUE,
+  scrollCollapse = TRUE
+))
+```
+
+
+
+-----
+
+
+
+The below rule has *no* *groupby* columns and *no filter*, aggreagtion is done on whole column, hence all the rows are returned
+```{r}
+
+datatable(
+  head(eachRuleoutput[[6]], 20), extensions = 'FixedColumns',
+  options = list(
+  dom = 't',
+  scrollX = TRUE,
+  scrollCollapse = TRUE
+))
 ```

@@ -1,6 +1,7 @@
 Filters,GroupBy,Column,Function,Operation,Argument,caseSensitive
 ,"Account_ID,Month",Transaction_Amount,sum,>=,10000,""""""
-,"Account_ID,Month",Transaction_ID,count,>,5,""""""
+risk_level == 'High',"Account_ID,Month",Transaction_ID,count,>,5,""""""
 Date > '2017-05-01' && Credit_Debit_Indicator == 'Debit',Account_ID,Transaction_ID,min,>,5,""""""
 ,Account_ID,Transaction_ID,max,>,5,""""""
 Credit_Debit_Indicator == 'Debit',,,,,,
+,,Transaction_Amount,sum,>=,10000000,
