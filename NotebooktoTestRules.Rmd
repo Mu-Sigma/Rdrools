@@ -40,18 +40,16 @@ source(file = "./src/main/resources/Rdrools/R/Rdrools.R")
 ```{r}
 
 
-sampleData <- read.csv("./src/main/resources/Rdrools/data/SampleDataset/TransactionsData.csv",stringsAsFactors = FALSE)
-sampleData <-sampleData[1:200,]
-#coverting the data to ymd format
-sampleData$Date <- ymd(sampleData$Date)
-str(sampleData)
+testdata <- iris
+colnames(testdata) <- gsub('\\.', '', colnames(testdata))
+str(testdata)
 ```
 
      
 ```{r,echo=FALSE}
 
 datatable(
-  head(sampleData, 20), extensions = 'FixedColumns',
+  head(testdata, 20), extensions = 'FixedColumns',
   options = list(
   dom = 't',
   scrollX = TRUE,
@@ -65,21 +63,21 @@ datatable(
 
 
 Each rule in the below is csv is:
-Rule1: No filter, aggregation by multiple columns
-Rule2: Filter and aggregation by multiple columns
-Rule3: Filter and aggregation by one column
-Rule4: No filter and aggregation by one column
-Rule5: Only filter,no aggregation
-Rule6: NO filter, aggregation on whole column
+
+  * Rule1: No filter and groupby 
+  * Rule2: Filter and aggregation on whole column
+  * Rule3: No Filter and aggregation on whole column
+  * Rule4: Only filter,no aggregation
+  * Rule5: Filter and groupby
 ```{r}
-sampleRules <-read.csv("./src/main/resources/Rdrools/data/SampleRules/workingRules.csv",stringsAsFactors = FALSE)
-sampleRules[is.na(sampleRules)]    <-""
+testRules <-read.csv("./src/main/resources/Rdrools/data/SampleRules/irisRules.csv",stringsAsFactors = FALSE)
+testRules[is.na(testRules)]    <-""
 ```
   
 ```{r,echo=FALSE}
 
 datatable(
-  head(sampleRules, 20), extensions = 'FixedColumns',
+  head(testRules, 20), extensions = 'FixedColumns',
   options = list(
   dom = 't',
   scrollX = TRUE,
@@ -92,16 +90,16 @@ datatable(
 ## Running the rules
 The function, *executeRulesOnDataset* returns two objects: 
   
-  * perRule: the list containing the each rule in drl format and csv format
-  * outputDf: the dataframe with all the input columns and one column for each rule (with flags true/false)
+  * *perRule*: the list containing the each rule in drl format and csv format
+  * *outputDf*: the dataframe with all the input columns and one column for each rule (with flags true/false)
 ```{r}
-output<- executeRulesOnDataset(dataset=sampleData,rules = sampleRules)
+output<- executeRulesOnDataset(dataset=testdata,rules = testRules)
 
 ```
 ```{r}
 
 datatable(
-  head(output[[2]], 20), extensions = 'FixedColumns',
+  head(output[["outputDfForEachRule"]][[1]]), extensions = 'FixedColumns',
   options = list(
   dom = 't',
   scrollX = TRUE,
@@ -114,68 +112,13 @@ datatable(
 -----
 
 
-## Rule in csv and drl format
+## Rule in csv format
 ```{r,message=NA}
-output[[1]][1]
+
+output[["perRule"]][[1]][[1]]
 ```
-
-## Output per rule
-The function, *getRuleWiseData* will give output for each rule separately. If there is *aggregation* in any of the rules, the output will have only the *groupby* column and the flag but not all the rows.
+## Meta data
+This function returns the meta data for each rule. The rules involving, groupby will get the group name and flag for each group. The rules with no groupby get the output same all the rows with flags.
 ```{r}
-eachRuleoutput <- getRuleWiseData(dataset = sampleData,outputDf = output[[2]],rules = sampleRules)
-
-```
-
-
------
-
-
-
-
-The below rule has two *groupby* columns
-```{r}
-
-datatable(
-  head(eachRuleoutput[[1]], 20), extensions = 'FixedColumns',
-  options = list(
-  dom = 't',
-  scrollX = TRUE,
-  scrollCollapse = TRUE
-))
-```
-
-
-
-------
-
-
-
-The below rule has *no* *groupby* columns and only filter, hence all the rows are returned
-```{r}
-
-datatable(
-  head(eachRuleoutput[[5]], 20), extensions = 'FixedColumns',
-  options = list(
-  dom = 't',
-  scrollX = TRUE,
-  scrollCollapse = TRUE
-))
-```
-
-
-
------
-
-
-
-The below rule has *no* *groupby* columns and *no filter*, aggreagtion is done on whole column, hence all the rows are returned
-```{r}
-
-datatable(
-  head(eachRuleoutput[[6]], 20), extensions = 'FixedColumns',
-  options = list(
-  dom = 't',
-  scrollX = TRUE,
-  scrollCollapse = TRUE
-))
+getRuleWiseData(dataset = testdata,outputDf =output[["outputDfForEachRule"]][[1]],rules = testRules,ruleNum = 1 )
 ```

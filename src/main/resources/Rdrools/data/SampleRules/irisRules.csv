@@ -1,0 +1,6 @@
+Filters,GroupBy,Column,Function,Operation,Argument
+,Species,SepalLength,sum,>=,300
+SepalWidth > 3,,SepalLength,sum,>=,101
+,,SepalLength,sum,<,900
+Species == 'setosa',,,,,
+PetalWidth > 0.4,Species,PetalLength,average,<,5

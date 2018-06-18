@@ -11,7 +11,7 @@
 
 <meta name="author" content="Dheekshitha PS" />
 
-<meta name="date" content="2018-06-13" />
+<meta name="date" content="2018-06-15" />
 
 <title>Notebook to test rules</title>
 
@@ -148,7 +148,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Notebook to test rules</h1>
 <h4 class="author"><em>Dheekshitha PS</em></h4>
-<h4 class="date"><em>13 June 2018</em></h4>
+<h4 class="date"><em>15 June 2018</em></h4>
 
 </div>
 
@@ -157,198 +157,75 @@ $(document).ready(function () {
 <li><a href="#loading-the-sample-data">Loading the sample data</a></li>
 <li><a href="#loading-the-sample-rules">Loading the sample rules</a></li>
 <li><a href="#running-the-rules">Running the rules</a></li>
-<li><a href="#rule-in-csv-and-drl-format">Rule in csv and drl format</a></li>
-<li><a href="#output-per-rule">Output per rule</a></li>
+<li><a href="#rule-in-csv-format">Rule in csv format</a></li>
+<li><a href="#meta-data">Meta data</a></li>
 </ul>
 </div>
 
 <div id="loading-the-sample-data" class="section level2">
 <h2>Loading the sample data</h2>
-<pre class="r"><code>sampleData &lt;- read.csv(&quot;./src/main/resources/Rdrools/data/SampleDataset/TransactionsData.csv&quot;,stringsAsFactors = FALSE)
-sampleData &lt;-sampleData[1:200,]
-#coverting the data to ymd format
-sampleData$Date &lt;- ymd(sampleData$Date)
-str(sampleData)</code></pre>
-<pre><code>## 'data.frame':    200 obs. of  15 variables:
-##  $ Account_ID            : chr  &quot;2266 97472609&quot; &quot;2266 97472609&quot; &quot;2266 97472609&quot; &quot;2266 97472609&quot; ...
-##  $ Customer_ID           : chr  &quot;HS 10003669&quot; &quot;HS 10003669&quot; &quot;HS 10003669&quot; &quot;HS 10003669&quot; ...
-##  $ Month                 : chr  &quot;Trans_Month1&quot; &quot;Trans_Month1&quot; &quot;Trans_Month1&quot; &quot;Trans_Month1&quot; ...
-##  $ Product_Type          : chr  &quot;Savings Account&quot; &quot;Savings Account&quot; &quot;Savings Account&quot; &quot;Savings Account&quot; ...
-##  $ No_of_transactions    : int  5 5 5 5 5 5 5 5 5 5 ...
-##  $ Account_open_date     : chr  &quot;2016-03-22&quot; &quot;2016-03-22&quot; &quot;2016-03-22&quot; &quot;2016-03-22&quot; ...
-##  $ Transaction_ID        : int  81993859 50847914 58383961 31707922 14904755 23169362 26156823 59730045 83134275 8863921 ...
-##  $ Date                  : Date, format: &quot;2016-10-03&quot; &quot;2016-10-06&quot; ...
-##  $ account_month         : chr  &quot;226697472609Trans_Month1&quot; &quot;226697472609Trans_Month1&quot; &quot;226697472609Trans_Month1&quot; &quot;226697472609Trans_Month1&quot; ...
-##  $ trans_tender_type     : chr  &quot;Overseas Transfer&quot; &quot;Domestic Transfer&quot; &quot;Cash Withdrawal&quot; &quot;Bill Payment&quot; ...
-##  $ Credit_Debit_Indicator: chr  &quot;Credit&quot; &quot;Credit&quot; &quot;Debit&quot; &quot;Debit&quot; ...
-##  $ Total_Transactions    : int  7 7 7 7 7 7 1 7 2 3 ...
-##  $ Transaction_Amount    : num  1262 141 700 739 600 ...
-##  $ Balance               : num  1262 1403 791 52 -512 ...
-##  $ risk_level            : chr  &quot;Low&quot; &quot;Low&quot; &quot;Low&quot; &quot;Low&quot; ...</code></pre>
-<div id="htmlwidget-545cfd8053181c322c40" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-545cfd8053181c322c40">{"x":{"filter":"none","extensions":["FixedColumns"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","9219 82124436","9219 82124436","9219 82124436","9219 82124436","9219 82124436"],["HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669"],["Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month4","Trans_Month5","Trans_Month5","Trans_Month6","Trans_Month6","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1"],["Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account"],[5,5,5,5,5,5,5,5,5,5,1,2,2,2,2,5,5,5,5,5],["2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2014-03-01","2014-03-01","2014-03-01","2014-03-01","2014-03-01"],[81993859,50847914,58383961,31707922,14904755,23169362,26156823,59730045,83134275,8863921,35965849,80386641,80110067,89822157,87959010,84475925,99815118,74430874,75085153,20232027],["2016-10-03","2016-10-06","2016-10-13","2016-10-16","2016-10-19","2016-11-09","2016-11-13","2016-11-15","2016-11-16","2016-11-17","2017-01-29","2017-02-15","2017-02-16","2017-03-01","2017-03-17","2016-10-14","2016-10-22","2016-10-23","2016-10-25","2016-10-29"],["226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month4","226697472609Trans_Month5","226697472609Trans_Month5","226697472609Trans_Month6","226697472609Trans_Month6","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1"],["Overseas Transfer","Domestic Transfer","Cash Withdrawal","Bill Payment","Cash Withdrawal","Domestic Transfer","Cash Deposit","Overseas Transfer","Domestic Transfer","Cash Withdrawal","Cash Deposit","Cash Deposit","Domestic Transfer","Cash Deposit","Overseas Transfer","Domestic Transfer","Domestic Transfer","Domestic Transfer","Cash Withdrawal","Bill Payment"],["Credit","Credit","Debit","Debit","Debit","Credit","Credit","Debit","Debit","Debit","Credit","Credit","Credit","Credit","Credit","Credit","Credit","Debit","Debit","Debit"],[7,7,7,7,7,7,1,7,2,3,2,3,2,2,3,13,2,13,13,7],[1262,141,700,739,600,1500,153,140,200,700,1497,1482,170,1111,900,1075,571,558,400,430],[1262,1403,791,52,-512,988,1141,1001,801,125,1622,3104,3274,4385,5285,1075,1646,1088,764,334],["Low","Low","Low","Low","Low","Low","High","Low","Low","Low","Low","Low","Low","Low","Medium","Low","Low","Low","Low","Low"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Account_ID<\/th>\n      <th>Customer_ID<\/th>\n      <th>Month<\/th>\n      <th>Product_Type<\/th>\n      <th>No_of_transactions<\/th>\n      <th>Account_open_date<\/th>\n      <th>Transaction_ID<\/th>\n      <th>Date<\/th>\n      <th>account_month<\/th>\n      <th>trans_tender_type<\/th>\n      <th>Credit_Debit_Indicator<\/th>\n      <th>Total_Transactions<\/th>\n      <th>Transaction_Amount<\/th>\n      <th>Balance<\/th>\n      <th>risk_level<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-right","targets":[5,7,12,13,14]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>testdata &lt;- iris
+colnames(testdata) &lt;- gsub('\\.', '', colnames(testdata))
+str(testdata)</code></pre>
+<pre><code>## 'data.frame':    150 obs. of  5 variables:
+##  $ SepalLength: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+##  $ SepalWidth : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+##  $ PetalLength: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+##  $ PetalWidth : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+##  $ Species    : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+<div id="htmlwidget-a936f4dfb905a004a00e" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a936f4dfb905a004a00e">{"x":{"filter":"none","extensions":["FixedColumns"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9,5.4,4.8,4.8,4.3,5.8,5.7,5.4,5.1,5.7,5.1],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1,3.7,3.4,3,3,4,4.4,3.9,3.5,3.8,3.8],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5,1.5,1.6,1.4,1.1,1.2,1.5,1.3,1.4,1.7,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1,0.2,0.2,0.1,0.1,0.2,0.4,0.4,0.3,0.3,0.3],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>SepalLength<\/th>\n      <th>SepalWidth<\/th>\n      <th>PetalLength<\/th>\n      <th>PetalWidth<\/th>\n      <th>Species<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="loading-the-sample-rules" class="section level2">
 <h2>Loading the sample rules</h2>
-<p>Each rule in the below is csv is: Rule1: No filter, aggregation by multiple columns Rule2: Filter and aggregation by multiple columns Rule3: Filter and aggregation by one column Rule4: No filter and aggregation by one column Rule5: Only filter,no aggregation Rule6: NO filter, aggregation on whole column</p>
-<pre class="r"><code>sampleRules &lt;-read.csv(&quot;./src/main/resources/Rdrools/data/SampleRules/workingRules.csv&quot;,stringsAsFactors = FALSE)
-sampleRules[is.na(sampleRules)]    &lt;-&quot;&quot;</code></pre>
-<div id="htmlwidget-3c55996f386d3ba64a7b" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3c55996f386d3ba64a7b">{"x":{"filter":"none","extensions":["FixedColumns"],"data":[["1","2","3","4","5","6"],["","risk_level == 'High'","Date &gt; '2017-05-01' &amp;&amp; Credit_Debit_Indicator == 'Debit'","","Credit_Debit_Indicator == 'Debit'",""],["Account_ID,Month","Account_ID,Month","Account_ID","Account_ID","",""],["Transaction_Amount","Transaction_ID","Transaction_ID","Transaction_ID","","Transaction_Amount"],["sum","count","min","max","","sum"],["&gt;=","&gt;","&gt;","&gt;","","&gt;="],["10000","5","5","5","","10000000"],["\"\"","\"\"","\"\"","\"\"","",""]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Filters<\/th>\n      <th>GroupBy<\/th>\n      <th>Column<\/th>\n      <th>Function<\/th>\n      <th>Operation<\/th>\n      <th>Argument<\/th>\n      <th>caseSensitive<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollCollapse":true,"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
+<p>Each rule in the below is csv is:</p>
+<ul>
+<li>Rule1: No filter and groupby</li>
+<li>Rule2: Filter and aggregation on whole column</li>
+<li>Rule3: No Filter and aggregation on whole column</li>
+<li>Rule4: Only filter,no aggregation</li>
+<li>Rule5: Filter and groupby</li>
+</ul>
+<pre class="r"><code>testRules &lt;-read.csv(&quot;./src/main/resources/Rdrools/data/SampleRules/irisRules.csv&quot;,stringsAsFactors = FALSE)
+testRules[is.na(testRules)]    &lt;-&quot;&quot;</code></pre>
+<div id="htmlwidget-1b81ceb06c3daab1ec9f" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1b81ceb06c3daab1ec9f">{"x":{"filter":"none","extensions":["FixedColumns"],"data":[["1","2","3","4","5"],["","SepalWidth &gt; 3","","Species == 'setosa'","PetalWidth &gt; 0.4"],["Species","","","","Species"],["SepalLength","SepalLength","SepalLength","","PetalLength"],["sum","sum","sum","","average"],["&gt;=","&gt;=","&lt;","","&lt;"],["300","101","900","","5"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Filters<\/th>\n      <th>GroupBy<\/th>\n      <th>Column<\/th>\n      <th>Function<\/th>\n      <th>Operation<\/th>\n      <th>Argument<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollCollapse":true,"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="running-the-rules" class="section level2">
 <h2>Running the rules</h2>
 <p>The function, <em>executeRulesOnDataset</em> returns two objects:</p>
 <ul>
-<li>perRule: the list containing the each rule in drl format and csv format</li>
-<li>outputDf: the dataframe with all the input columns and one column for each rule (with flags true/false)</li>
+<li><em>perRule</em>: the list containing the each rule in drl format and csv format</li>
+<li><em>outputDf</em>: the dataframe with all the input columns and one column for each rule (with flags true/false)</li>
 </ul>
-<pre class="r"><code>output&lt;- executeRulesOnDataset(dataset=sampleData,rules = sampleRules)</code></pre>
+<pre class="r"><code>output&lt;- executeRulesOnDataset(dataset=testdata,rules = testRules)</code></pre>
 <pre class="r"><code>datatable(
-  head(output[[2]], 20), extensions = 'FixedColumns',
+  head(output[[&quot;outputDfForEachRule&quot;]][[1]]), extensions = 'FixedColumns',
   options = list(
   dom = 't',
   scrollX = TRUE,
   scrollCollapse = TRUE
 ))</code></pre>
-<div id="htmlwidget-1824a56819ba7a0347b0" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1824a56819ba7a0347b0">{"x":{"filter":"none","extensions":["FixedColumns"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","9219 82124436","9219 82124436","9219 82124436","9219 82124436","9219 82124436"],["HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669"],["Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month4","Trans_Month5","Trans_Month5","Trans_Month6","Trans_Month6","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1"],["Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account"],[5,5,5,5,5,5,5,5,5,5,1,2,2,2,2,5,5,5,5,5],["2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2014-03-01","2014-03-01","2014-03-01","2014-03-01","2014-03-01"],[81993859,50847914,58383961,31707922,14904755,23169362,26156823,59730045,83134275,8863921,35965849,80386641,80110067,89822157,87959010,84475925,99815118,74430874,75085153,20232027],["2016-10-03","2016-10-06","2016-10-13","2016-10-16","2016-10-19","2016-11-09","2016-11-13","2016-11-15","2016-11-16","2016-11-17","2017-01-29","2017-02-15","2017-02-16","2017-03-01","2017-03-17","2016-10-14","2016-10-22","2016-10-23","2016-10-25","2016-10-29"],["226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month4","226697472609Trans_Month5","226697472609Trans_Month5","226697472609Trans_Month6","226697472609Trans_Month6","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1"],["Overseas Transfer","Domestic Transfer","Cash Withdrawal","Bill Payment","Cash Withdrawal","Domestic Transfer","Cash Deposit","Overseas Transfer","Domestic Transfer","Cash Withdrawal","Cash Deposit","Cash Deposit","Domestic Transfer","Cash Deposit","Overseas Transfer","Domestic Transfer","Domestic Transfer","Domestic Transfer","Cash Withdrawal","Bill Payment"],["Credit","Credit","Debit","Debit","Debit","Credit","Credit","Debit","Debit","Debit","Credit","Credit","Credit","Credit","Credit","Credit","Credit","Debit","Debit","Debit"],[7,7,7,7,7,7,1,7,2,3,2,3,2,2,3,13,2,13,13,7],[1262,141,700,739,600,1500,153,140,200,700,1497,1482,170,1111,900,1075,571,558,400,430],[1262,1403,791,52,-512,988,1141,1001,801,125,1622,3104,3274,4385,5285,1075,1646,1088,764,334],["Low","Low","Low","Low","Low","Low","High","Low","Low","Low","Low","Low","Low","Low","Medium","Low","Low","Low","Low","Low"],["false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false"],["false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false"],["true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true"],["true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true","true"],["false","false","true","true","true","false","false","true","true","true","false","false","false","false","false","false","false","true","true","true"],["false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false"],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Account_ID<\/th>\n      <th>Customer_ID<\/th>\n      <th>Month<\/th>\n      <th>Product_Type<\/th>\n      <th>No_of_transactions<\/th>\n      <th>Account_open_date<\/th>\n      <th>Transaction_ID<\/th>\n      <th>Date<\/th>\n      <th>account_month<\/th>\n      <th>trans_tender_type<\/th>\n      <th>Credit_Debit_Indicator<\/th>\n      <th>Total_Transactions<\/th>\n      <th>Transaction_Amount<\/th>\n      <th>Balance<\/th>\n      <th>risk_level<\/th>\n      <th>Rule1<\/th>\n      <th>Rule2<\/th>\n      <th>Rule3<\/th>\n      <th>Rule4<\/th>\n      <th>Rule5<\/th>\n      <th>Rule6<\/th>\n      <th>rowNumber<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-right","targets":[5,7,12,13,14,22]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-50af0da853cabcd410ff" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-50af0da853cabcd410ff">{"x":{"filter":"none","extensions":["FixedColumns"],"data":[["1","2","3","4","5","6"],[5.1,4.9,4.7,4.6,5,5.4],[3.5,3,3.2,3.1,3.6,3.9],[1.4,1.4,1.3,1.5,1.4,1.7],[0.2,0.2,0.2,0.2,0.2,0.4],["setosa","setosa","setosa","setosa","setosa","setosa"],["false","false","false","false","false","false"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>SepalLength<\/th>\n      <th>SepalWidth<\/th>\n      <th>PetalLength<\/th>\n      <th>PetalWidth<\/th>\n      <th>Species<\/th>\n      <th>Rule1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <hr />
 </div>
-<div id="rule-in-csv-and-drl-format" class="section level2">
-<h2>Rule in csv and drl format</h2>
-<pre class="r"><code>output[[1]][1]</code></pre>
-<pre><code>## [[1]]
-## [[1]][[1]]
-##   Filters          GroupBy             Column Function Operation Argument
-## 1         Account_ID,Month Transaction_Amount      sum        &gt;=    10000
-##   caseSensitive
-## 1            &quot;&quot;
-## 
-## [[1]][[2]]
-## [[1]][[2]][[1]]
-## [1] &quot;import java.util.HashMap&quot;
-## 
-## [[1]][[2]][[2]]
-## [1] &quot;import java.lang.Double&quot;
-## 
-## [[1]][[2]][[3]]
-## [1] &quot;global java.util.HashMap output&quot;
-## 
-## [[1]][[2]][[4]]
-## [1] &quot;&quot;
-## 
-## [[1]][[2]][[5]]
-## [1] &quot;  dialect \&quot;mvel\&quot;&quot;
-## 
-## [[1]][[2]][[6]]
-## [1] &quot;rule \&quot;Rule1\&quot;&quot;
-## 
-## [[1]][[2]][[7]]
-## [1] &quot;       salience 0&quot;
-## 
-## [[1]][[2]][[8]]
-## [1] &quot;       when&quot;
-## 
-## [[1]][[2]][[9]]
-## [1] &quot;        input: HashMap()&quot;
-## 
-## [[1]][[2]][[10]]
-## [[1]][[2]][[10]][[1]]
-## [1] &quot;result: Double()\n                                             from accumulate($condition:HashMap(Account_ID==input.get(\&quot;Account_ID\&quot;),Month==input.get(\&quot;Month\&quot;)),sum(Double.valueOf($condition.get('Transaction_Amount').toString())))&quot;
-## 
-## 
-## [[1]][[2]][[11]]
-## [1] &quot;then&quot;
-## 
-## [[1]][[2]][[12]]
-## [1] &quot;output.put('Account_ID',input.get('Account_ID'));&quot;
-## 
-## [[1]][[2]][[13]]
-## [1] &quot;output.put('Customer_ID',input.get('Customer_ID'));&quot;
-## 
-## [[1]][[2]][[14]]
-## [1] &quot;output.put('Month',input.get('Month'));&quot;
-## 
-## [[1]][[2]][[15]]
-## [1] &quot;output.put('Product_Type',input.get('Product_Type'));&quot;
-## 
-## [[1]][[2]][[16]]
-## [1] &quot;output.put('No_of_transactions',input.get('No_of_transactions'));&quot;
-## 
-## [[1]][[2]][[17]]
-## [1] &quot;output.put('Account_open_date',input.get('Account_open_date'));&quot;
-## 
-## [[1]][[2]][[18]]
-## [1] &quot;output.put('Transaction_ID',input.get('Transaction_ID'));&quot;
-## 
-## [[1]][[2]][[19]]
-## [1] &quot;output.put('Date',input.get('Date'));&quot;
-## 
-## [[1]][[2]][[20]]
-## [1] &quot;output.put('account_month',input.get('account_month'));&quot;
-## 
-## [[1]][[2]][[21]]
-## [1] &quot;output.put('trans_tender_type',input.get('trans_tender_type'));&quot;
-## 
-## [[1]][[2]][[22]]
-## [1] &quot;output.put('Credit_Debit_Indicator',input.get('Credit_Debit_Indicator'));&quot;
-## 
-## [[1]][[2]][[23]]
-## [1] &quot;output.put('Total_Transactions',input.get('Total_Transactions'));&quot;
-## 
-## [[1]][[2]][[24]]
-## [1] &quot;output.put('Transaction_Amount',input.get('Transaction_Amount'));&quot;
-## 
-## [[1]][[2]][[25]]
-## [1] &quot;output.put('Balance',input.get('Balance'));&quot;
-## 
-## [[1]][[2]][[26]]
-## [1] &quot;output.put('risk_level',input.get('risk_level'));&quot;
-## 
-## [[1]][[2]][[27]]
-## [1] &quot;output.put(\&quot;Rule1\&quot;,result&gt;=10000);&quot;
-## 
-## [[1]][[2]][[28]]
-## [1] &quot;end&quot;</code></pre>
+<div id="rule-in-csv-format" class="section level2">
+<h2>Rule in csv format</h2>
+<pre class="r"><code>output[[&quot;perRule&quot;]][[1]][[1]]</code></pre>
+<pre><code>##   Filters GroupBy      Column Function Operation Argument
+## 1         Species SepalLength      sum        &gt;=      300</code></pre>
 </div>
-<div id="output-per-rule" class="section level2">
-<h2>Output per rule</h2>
-<p>The function, <em>getRuleWiseData</em> will give output for each rule separately. If there is <em>aggregation</em> in any of the rules, the output will have only the <em>groupby</em> column and the flag but not all the rows.</p>
-<pre class="r"><code>eachRuleoutput &lt;- getRuleWiseData(dataset = sampleData,outputDf = output[[2]],rules = sampleRules)</code></pre>
-<hr />
-<p>The below rule has two <em>groupby</em> columns</p>
-<pre class="r"><code>datatable(
-  head(eachRuleoutput[[1]], 20), extensions = 'FixedColumns',
-  options = list(
-  dom = 't',
-  scrollX = TRUE,
-  scrollCollapse = TRUE
-))</code></pre>
-<div id="htmlwidget-e1324f64dd821caea8c9" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e1324f64dd821caea8c9">{"x":{"filter":"none","extensions":["FixedColumns"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["1300 41463086","1300 41463086","1300 41463086","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","3077 81314800","3077 81314800","7855 10363896","7855 10363896","7855 10363896","7855 10363896","7855 10363896","7855 10363896","7855 10363896","7855 10363896","8013 56155237","8013 56155237"],["Trans_Month10","Trans_Month11","Trans_Month12","Trans_Month1","Trans_Month2","Trans_Month4","Trans_Month5","Trans_Month6","Trans_Month3","Trans_Month6","Trans_Month10","Trans_Month12","Trans_Month2","Trans_Month5","Trans_Month6","Trans_Month7","Trans_Month8","Trans_Month9","Trans_Month2","Trans_Month3"],["true","true","true","false","false","false","false","false","true","false","false","false","false","false","false","false","false","false","true","false"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Account_ID<\/th>\n      <th>Month<\/th>\n      <th>Rule1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollCollapse":true,"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
-<hr />
-<p>The below rule has <em>no</em> <em>groupby</em> columns and only filter, hence all the rows are returned</p>
-<pre class="r"><code>datatable(
-  head(eachRuleoutput[[5]], 20), extensions = 'FixedColumns',
-  options = list(
-  dom = 't',
-  scrollX = TRUE,
-  scrollCollapse = TRUE
-))</code></pre>
-<div id="htmlwidget-1ce20ae5e3aa360deba4" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1ce20ae5e3aa360deba4">{"x":{"filter":"none","extensions":["FixedColumns"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","9219 82124436","9219 82124436","9219 82124436","9219 82124436","9219 82124436"],["HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669"],["Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month4","Trans_Month5","Trans_Month5","Trans_Month6","Trans_Month6","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1"],["Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account"],[5,5,5,5,5,5,5,5,5,5,1,2,2,2,2,5,5,5,5,5],["2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2014-03-01","2014-03-01","2014-03-01","2014-03-01","2014-03-01"],[81993859,50847914,58383961,31707922,14904755,23169362,26156823,59730045,83134275,8863921,35965849,80386641,80110067,89822157,87959010,84475925,99815118,74430874,75085153,20232027],["2016-10-03","2016-10-06","2016-10-13","2016-10-16","2016-10-19","2016-11-09","2016-11-13","2016-11-15","2016-11-16","2016-11-17","2017-01-29","2017-02-15","2017-02-16","2017-03-01","2017-03-17","2016-10-14","2016-10-22","2016-10-23","2016-10-25","2016-10-29"],["226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month4","226697472609Trans_Month5","226697472609Trans_Month5","226697472609Trans_Month6","226697472609Trans_Month6","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1"],["Overseas Transfer","Domestic Transfer","Cash Withdrawal","Bill Payment","Cash Withdrawal","Domestic Transfer","Cash Deposit","Overseas Transfer","Domestic Transfer","Cash Withdrawal","Cash Deposit","Cash Deposit","Domestic Transfer","Cash Deposit","Overseas Transfer","Domestic Transfer","Domestic Transfer","Domestic Transfer","Cash Withdrawal","Bill Payment"],["Credit","Credit","Debit","Debit","Debit","Credit","Credit","Debit","Debit","Debit","Credit","Credit","Credit","Credit","Credit","Credit","Credit","Debit","Debit","Debit"],[7,7,7,7,7,7,1,7,2,3,2,3,2,2,3,13,2,13,13,7],[1262,141,700,739,600,1500,153,140,200,700,1497,1482,170,1111,900,1075,571,558,400,430],[1262,1403,791,52,-512,988,1141,1001,801,125,1622,3104,3274,4385,5285,1075,1646,1088,764,334],["Low","Low","Low","Low","Low","Low","High","Low","Low","Low","Low","Low","Low","Low","Medium","Low","Low","Low","Low","Low"],["false","false","true","true","true","false","false","true","true","true","false","false","false","false","false","false","false","true","true","true"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Account_ID<\/th>\n      <th>Customer_ID<\/th>\n      <th>Month<\/th>\n      <th>Product_Type<\/th>\n      <th>No_of_transactions<\/th>\n      <th>Account_open_date<\/th>\n      <th>Transaction_ID<\/th>\n      <th>Date<\/th>\n      <th>account_month<\/th>\n      <th>trans_tender_type<\/th>\n      <th>Credit_Debit_Indicator<\/th>\n      <th>Total_Transactions<\/th>\n      <th>Transaction_Amount<\/th>\n      <th>Balance<\/th>\n      <th>risk_level<\/th>\n      <th>Rule5<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-right","targets":[5,7,12,13,14]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<hr />
-<p>The below rule has <em>no</em> <em>groupby</em> columns and <em>no filter</em>, aggreagtion is done on whole column, hence all the rows are returned</p>
-<pre class="r"><code>datatable(
-  head(eachRuleoutput[[6]], 20), extensions = 'FixedColumns',
-  options = list(
-  dom = 't',
-  scrollX = TRUE,
-  scrollCollapse = TRUE
-))</code></pre>
-<div id="htmlwidget-b6971431564b8f613b3a" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-b6971431564b8f613b3a">{"x":{"filter":"none","extensions":["FixedColumns"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","2266 97472609","9219 82124436","9219 82124436","9219 82124436","9219 82124436","9219 82124436"],["HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669","HS 10003669"],["Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month2","Trans_Month4","Trans_Month5","Trans_Month5","Trans_Month6","Trans_Month6","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1","Trans_Month1"],["Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account","Savings Account"],[5,5,5,5,5,5,5,5,5,5,1,2,2,2,2,5,5,5,5,5],["2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2016-03-22","2014-03-01","2014-03-01","2014-03-01","2014-03-01","2014-03-01"],[81993859,50847914,58383961,31707922,14904755,23169362,26156823,59730045,83134275,8863921,35965849,80386641,80110067,89822157,87959010,84475925,99815118,74430874,75085153,20232027],["2016-10-03","2016-10-06","2016-10-13","2016-10-16","2016-10-19","2016-11-09","2016-11-13","2016-11-15","2016-11-16","2016-11-17","2017-01-29","2017-02-15","2017-02-16","2017-03-01","2017-03-17","2016-10-14","2016-10-22","2016-10-23","2016-10-25","2016-10-29"],["226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month1","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month2","226697472609Trans_Month4","226697472609Trans_Month5","226697472609Trans_Month5","226697472609Trans_Month6","226697472609Trans_Month6","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1","921982124436Trans_Month1"],["Overseas Transfer","Domestic Transfer","Cash Withdrawal","Bill Payment","Cash Withdrawal","Domestic Transfer","Cash Deposit","Overseas Transfer","Domestic Transfer","Cash Withdrawal","Cash Deposit","Cash Deposit","Domestic Transfer","Cash Deposit","Overseas Transfer","Domestic Transfer","Domestic Transfer","Domestic Transfer","Cash Withdrawal","Bill Payment"],["Credit","Credit","Debit","Debit","Debit","Credit","Credit","Debit","Debit","Debit","Credit","Credit","Credit","Credit","Credit","Credit","Credit","Debit","Debit","Debit"],[7,7,7,7,7,7,1,7,2,3,2,3,2,2,3,13,2,13,13,7],[1262,141,700,739,600,1500,153,140,200,700,1497,1482,170,1111,900,1075,571,558,400,430],[1262,1403,791,52,-512,988,1141,1001,801,125,1622,3104,3274,4385,5285,1075,1646,1088,764,334],["Low","Low","Low","Low","Low","Low","High","Low","Low","Low","Low","Low","Low","Low","Medium","Low","Low","Low","Low","Low"],["false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false","false"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Account_ID<\/th>\n      <th>Customer_ID<\/th>\n      <th>Month<\/th>\n      <th>Product_Type<\/th>\n      <th>No_of_transactions<\/th>\n      <th>Account_open_date<\/th>\n      <th>Transaction_ID<\/th>\n      <th>Date<\/th>\n      <th>account_month<\/th>\n      <th>trans_tender_type<\/th>\n      <th>Credit_Debit_Indicator<\/th>\n      <th>Total_Transactions<\/th>\n      <th>Transaction_Amount<\/th>\n      <th>Balance<\/th>\n      <th>risk_level<\/th>\n      <th>Rule6<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-right","targets":[5,7,12,13,14]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="meta-data" class="section level2">
+<h2>Meta data</h2>
+<p>This function returns the meta data for each rule. The rules involving, groupby will get the group name and flag for each group. The rules with no groupby get the output same all the rows with flags.</p>
+<pre class="r"><code>getRuleWiseData(dataset = testdata,outputDf =output[[&quot;outputDfForEachRule&quot;]][[1]],rules = testRules,ruleNum = 1 )</code></pre>
+<pre><code>## # A tibble: 3 x 2
+##   Species    Rule1
+##   &lt;fct&gt;      &lt;fct&gt;
+## 1 setosa     false
+## 2 versicolor false
+## 3 virginica  true</code></pre>
 </div>
 
 
