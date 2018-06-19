@@ -92,6 +92,7 @@ The function, *executeRulesOnDataset* returns two objects:
   
   * *perRule*: the list containing the each rule in drl format and csv format
   * *outputDf*: the dataframe with all the input columns and one column for each rule (with flags true/false)
+  * *metaDataperRule*: row numbers with flags for each rule
 ```{r}
 output<- executeRulesOnDataset(dataset=testdata,rules = testRules)
 
@@ -99,7 +100,7 @@ output<- executeRulesOnDataset(dataset=testdata,rules = testRules)
 ```{r}
 
 datatable(
-  head(output[["outputDfForEachRule"]][[1]]), extensions = 'FixedColumns',
+  head(output[["outputDfForEachRule"]][[3]]), extensions = 'FixedColumns',
   options = list(
   dom = 't',
   scrollX = TRUE,
@@ -118,7 +119,28 @@ datatable(
 output[["perRule"]][[1]][[1]]
 ```
 ## Meta data
-This function returns the meta data for each rule. The rules involving, groupby will get the group name and flag for each group. The rules with no groupby get the output same all the rows with flags.
+This function returns the meta data for each rule. The rules involving, groupby will get the group name and flag for each group. The rules with no groupby get the output with all the rows with flags.
 ```{r}
-getRuleWiseData(dataset = testdata,outputDf =output[["outputDfForEachRule"]][[1]],rules = testRules,ruleNum = 1 )
+datatable(
+output[["metaDataperRule"]][[2]], extensions = 'FixedColumns',
+  options = list(
+  dom = 't',
+  scrollX = TRUE,
+  scrollCollapse = TRUE
+))
+
+
+```
+
+Below is how the output looks when there is a groupby
+```{r,message=NA}
+datatable(
+  output[["metaDataperRule"]][[1]], extensions = 'FixedColumns',
+  options = list(
+  dom = 't',
+  scrollX = TRUE,
+  scrollCollapse = TRUE
+))
+
+
 ```
