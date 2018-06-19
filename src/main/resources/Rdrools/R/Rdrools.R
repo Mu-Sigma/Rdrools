@@ -163,7 +163,16 @@ executeRulesOnDataset <- function(dataset,rules){
     metaDataperRule[[i]] <- formatOutput(dataset = dataset,outputDf = outputDf[[i]],rules = rules,filteredDataFalse =filteredDataFalse ,input.columns=input.columns,ruleNum=i)[[2]]
     
   }
-  return(list(perRule=perRule,outputPerRule=metaDataperRule))
+  intermediateOutput <- list(rep(NULL, nrow(rules)))
+  outputList <-list(perRule=perRule,
+                    intermediateOutput = intermediateOutput,
+                    outputPerRule=metaDataperRule)
+  
+  output <- mapply(list,
+                   input=perRule,
+                   intermediateOutput = intermediateOutput,
+                   output=metaDataperRule, SIMPLIFY = F)
+  return(output)
   
 }
 
@@ -309,7 +318,8 @@ formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,
     ruleValue <- paste0("Rule",ruleNum,"Value")
     if(aggregationFunc != "compare" && aggregationFunc != ""){
       #agg on whole column  
-      outputFormatted <- as_tibble(outputDf%>%slice(n()))
+      outputFormatted <- outputDf%>%slice(n())
+      
       ifelse(outputFormatted[,ruleName][1,]=='true',outputDf[c(1:nrow(outputDf)), ruleName] <-"true",outputDf[c(1:nrow(outputDf)), ruleName]  <- "false")
       
       outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]

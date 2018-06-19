@@ -9,9 +9,23 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+```{r echo = FALSE, message = FALSE, results = 'hide', warning = FALSE, error=FALSE}
+#Package installation if required for handbook
+required.packages <- c('Rdrools','DT','lubridate','purrr','dplyr')
+
+for(pkg in required.packages){
+  if(!require(pkg,character.only = T)){
+    install.packages(pkg, repos = "http://cloud.r-project.org/")
+    library(pkg)
+  }
+}
+
+```
+
 ```{r setup, include=FALSE}
 #knitr::opts_chunk$set(echo = TRUE)
-library(Rdrools)
+#library(Rdrools)
+#library(purrr)
 source("../R/Rdrools.R")
 source("../../Rdroolsjars/R/onLoad.R")
 options(stringsAsFactors = F)
@@ -108,7 +122,7 @@ To illustrate this case, we apply only rule 4 from the set of sample rules.
 ```{r}
 filterColAggregationRule <- sampleRules[4,]
 filterColAggregationRuleOutput <- executeRulesOnDataset(iris, filterColAggregationRule)
-str(filterGroupByAggrRuleOutput)
+str(filterColAggregationRuleOutput)
 ```
 
 ### Applying a filter with grouped aggregation
