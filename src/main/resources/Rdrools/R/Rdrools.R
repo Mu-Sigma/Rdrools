@@ -128,7 +128,7 @@ executeRulesOnDataset <- function(dataset,rules){
     }
     drlRules[length(drlRules)+1] <-'end'
     rulesList[[i]] <- drlRules
-    perRule[[i]] <- list(rules[i,],drlRules)
+    perRule[[i]] <- rules[i,]
     
     
     if(filterData != ""){
@@ -161,8 +161,9 @@ executeRulesOnDataset <- function(dataset,rules){
     
     outputDfForEachRule[[i]] <- formatOutput(dataset = dataset,outputDf = outputDf[[i]],rules = rules,filteredDataFalse =filteredDataFalse ,input.columns=input.columns,ruleNum=i)$outputDf
     metaDataperRule[[i]] <- formatOutput(dataset = dataset,outputDf = outputDf[[i]],rules = rules,filteredDataFalse =filteredDataFalse ,input.columns=input.columns,ruleNum=i)[[2]]
+    
   }
-  return(list(perRule=perRule,outputDfForEachRule=outputDfForEachRule,metaDataperRule=metaDataperRule))
+  return(list(perRule=perRule,outputPerRule=metaDataperRule))
   
 }
 
@@ -286,7 +287,7 @@ formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,
     
     outputFormatted <-  eval(parse(text=paste('outputDf%>%group_by(',groupbyColumn,')%>%slice(c(1,n()))%>%ungroup()')))  
     metaDataperRule <- eval(parse(text=paste('outputDf%>%group_by(',groupbyColumn,')%>%slice(c(n()))%>%ungroup()')))
-    metaDataperRule$indices <- 0
+    metaDataperRule$Indices <- 0
     for(j in 1:nrow(metaDataperRule)){
       lowerRange<-outputFormatted[2*j-1,"rowNumber"]
       upperRange <- outputFormatted[2*j,"rowNumber"]
@@ -295,14 +296,12 @@ formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,
       outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
       
       outputDf <- rbind(outputDf,filteredDataFalse)
-      
-      
       #getting the required ciolumns from the output
       groupbyColumn <-unlist(strsplit(groupbyColumn,","))
-      metaDataperRule <- metaDataperRule[,c(groupbyColumn,ruleName,"indices",ruleValue)]
+      metaDataperRule <- metaDataperRule[,c(groupbyColumn,ruleName,"Indices")]
       
-      metaDataperRule[j,"indices"]<-paste(seq(as.numeric(lowerRange),as.numeric(upperRange)),collapse = ",")
-      
+      metaDataperRule[j,"Indices"]<-paste(seq(as.numeric(lowerRange),as.numeric(upperRange)),collapse = ",")
+      metaDataperRule <- metaDataperRule[,c(groupbyColumn,"Indices",ruleName)]
       
     }  
   }else{
@@ -316,8 +315,9 @@ formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,
       outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
       outputDf <- rbind(outputDf,filteredDataFalse)
       metaDataperRule <- outputFormatted
-      metaDataperRule$indices <- paste(seq(1,nrow(outputDf)),collapse = ",")
-      metaDataperRule <- metaDataperRule[,c(ruleName,"indices",ruleValue)]
+      metaDataperRule$Group <- 1
+      metaDataperRule$Indices <- paste(outputDf[,"rowNumber"],collapse = ",")
+      metaDataperRule <- metaDataperRule[,c("Group","Indices",ruleName)]
       
     }else{
       ruleName <- paste0("Rule",ruleNum)
@@ -326,11 +326,15 @@ formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,
       outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
       outputDf <- rbind(outputDf,filteredDataFalse)
       metaDataperRule <- outputDf
-      metaDataperRule$indices <- outputDf$rowNumber
-      metaDataperRule <- metaDataperRule[,c(ruleName,"indices",ruleValue)]
+      metaDataperRule$Group <-outputDf$rowNumber
+      metaDataperRule$Indices <- outputDf$rowNumber
+      
+      metaDataperRule <- metaDataperRule[,c("Group","Indices",ruleName)]
+      
     }
     
   }
+  metaDataperRule <- setNames(metaDataperRule, c("Group","Indices","IsTrue"))
   
   return(list(outputDf=outputDf,metaDataperRule=metaDataperRule))
 }
@@ -360,7 +364,7 @@ getRuleWiseData <-function(dataset,outputDf,rules,ruleNum){
     #getting the required ciolumns from the output
     groupbyColumn <-unlist(strsplit(groupbyColumn,","))
     metaDataperRule <- metaDataperRule[,c(groupbyColumn,ruleName,"rowNumber")]
-    metaDataperRule$indices <- 0
+    metaDataperRule$Indices <- 0
     
   }else{
     #getting the required colums from the output

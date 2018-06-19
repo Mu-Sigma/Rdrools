@@ -63,19 +63,14 @@ datatable(
 
 
 Each rule in the below is csv is:
-
-  * Rule1: No filter and groupby 
-  * Rule2: Filter and aggregation on whole column
+  * Rule1: Only filter,no aggregation
+  * Rule2: No filter and groupby 
   * Rule3: No Filter and aggregation on whole column
-  * Rule4: Only filter,no aggregation
+  * Rule4: Filter and aggregation on whole column
   * Rule5: Filter and groupby
 ```{r}
 testRules <-read.csv("./src/main/resources/Rdrools/data/SampleRules/irisRules.csv",stringsAsFactors = FALSE)
 testRules[is.na(testRules)]    <-""
-testRules[2,"Column"]<-"SepalLength"
-testRules[3,"Column"]<-"SepalLength"
-testRules[4,"Column"]<-"SepalLength"
-testRules[4,"Filters"]<-"SepalWidth > 3"
 ```
   
 ```{r,echo=FALSE}
@@ -94,9 +89,9 @@ datatable(
 ## Running the rules
 The function, *executeRulesOnDataset* returns two objects: 
   
-  * *perRule*: the list containing the each rule in drl format and csv format
-  * *outputDf*: the dataframe with all the input columns and one column for each rule (with flags true/false)
-  * *metaDataperRule*: row numbers with flags for each rule
+  * *perRule*: the list containing the each rule in csv format
+ 
+  * *outputPerRule*: row numbers with flags for each rule
 ```{r}
 output<- executeRulesOnDataset(dataset=testdata,rules = testRules)
 
@@ -104,7 +99,7 @@ output<- executeRulesOnDataset(dataset=testdata,rules = testRules)
 ```{r}
 
 datatable(
-  head(output[["outputDfForEachRule"]][[3]]), extensions = 'FixedColumns',
+  output[["outputPerRule"]][[3]], extensions = 'FixedColumns',
   options = list(
   dom = 't',
   scrollX = TRUE,
@@ -120,13 +115,13 @@ datatable(
 ## Rule in csv format
 ```{r,message=NA}
 
-output[["perRule"]][[1]][[1]]
+output[["perRule"]][[2]]
 ```
-## Meta data
+## Final Output
 This function returns the meta data for each rule. The rules involving, groupby will get the group name and flag for each group. The rules with no groupby get the output with all the rows with flags.
 ```{r}
 datatable(
-output[["metaDataperRule"]][[1]], extensions = 'FixedColumns',
+output[["outputPerRule"]][[1]], extensions = 'FixedColumns',
   options = list(
   dom = 't',
   scrollX = TRUE,
@@ -139,7 +134,7 @@ output[["metaDataperRule"]][[1]], extensions = 'FixedColumns',
 Below is how the output looks when there is a groupby
 ```{r,message=NA}
 datatable(
-  output[["metaDataperRule"]][[5]], extensions = 'FixedColumns',
+  output[["outputPerRule"]][[5]], extensions = 'FixedColumns',
   options = list(
   dom = 't',
   scrollX = TRUE,
@@ -152,7 +147,7 @@ datatable(
 Below is the output when there is aggregation on whole column
 ```{r}
 datatable(
-output[["metaDataperRule"]][[3]], extensions = 'FixedColumns',
+output[["outputPerRule"]][[3]], extensions = 'FixedColumns',
   options = list(
   dom = 't',
   scrollX = TRUE,
