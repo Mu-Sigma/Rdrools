@@ -20,10 +20,12 @@ library(Rdrools)
 
 The Rdrools package aims to accomplish two main objectives:
 
-* Allow data scientists an intuitive interface to **execute business rules on datasets for the purpose of analysis**, while leveraging the Drools rule engine
+* Allow data scientists an intuitive interface to **execute business rules on datasets for the purpose of analysis or designing intelligent systems**, while leveraging the Drools rule engine
 * Provide a direct interface to *Drools* for executing all types of rules defined in *Drools* formats - *.drl* and *.dt*
 
 ## The advantages of a rule engine
+
+Rule engines allow for optimal checking of rules against data for large rule sets [of the order of hundreds or even thousands of rules]. *Drools*
 
 ## Where to use RDrools
 
