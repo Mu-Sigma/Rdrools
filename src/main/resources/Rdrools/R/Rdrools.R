@@ -52,7 +52,7 @@ executeRulesOnDataset <- function(dataset,rules){
     aggregationFunc <-noquote( rules[i,"Function"])
     operation <-  rules[i,"Operation"]
     argument <- rules[i,"Argument"]
-    
+    #paste("Rule",i) <- list()
     
     # checking if there are more than one group by
     if(unlist(gregexpr(pattern =',',groupbyColumn))!=-1 && groupbyColumn!=""){
