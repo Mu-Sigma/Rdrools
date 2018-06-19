@@ -10,8 +10,11 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#knitr::opts_chunk$set(echo = TRUE)
 library(Rdrools)
+source("../R/Rdrools.R")
+source("../../Rdroolsjars/R/onLoad.R")
+options(stringsAsFactors = F)
 ```
 
 # Introduction
@@ -25,9 +28,11 @@ The Rdrools package aims to accomplish two main objectives:
 
 ## The advantages of a rule engine
 
-Rule engines allow for optimal checking of rules against data for large rule sets [of the order of hundreds or even thousands of rules]. *Drools*
+Rule engines allow for optimal checking of rules against data for large rule sets [of the order of hundreds or even thousands of rules]. *Drools* [and other rule engines] implement an enhanced version of the **Rete algorithm**, which efficiently match **facts** [data tuples] against **conditions** [rules]. This allows for codifying intuition/ business context which can be used to power intelligent systems.
 
-## Where to use RDrools
+## Why Rdrools
+
+RDrools brings the efficiencies of large scale production rule systems to data science users. Rule sets can be used alone, or in conjunction with machine learning models, to develop and operationalize intelligent systems. RDrools allows for deployment of rules defined through an R interface into a production system. As data comes in [periodic or real-time], a pre-defined set of rules can be checked on the data, and actions can be triggered based on the result
 
 # Running rules on **Rdrools**
 
@@ -44,6 +49,7 @@ For ease of use, the rules can be defined in a *csv* format, with a familiar str
 
 ```{r}
 data(iris)
+colnames(iris) <- c("SepalLength", "SepalWidth",  "PetalLength", "PetalWidth", "Species")
 sampleRules <- read.csv("../data/SampleRules/irisRules.csv")
 rownames(sampleRules) <- seq(1:nrow(sampleRules))
 sampleRules[is.na(sampleRules)]    <-""
@@ -113,17 +119,18 @@ To illustrate this case, we apply only rule 5 from the set of sample rules.
 
 ```{r}
 filterGroupByAggrRule <- sampleRules[5,]
-filterGroupByAggrRuleOutput <- executeRulesOnDataset(iris2, filterGroupByAggrRule)
+filterGroupByAggrRuleOutput <- executeRulesOnDataset(iris, filterGroupByAggrRule)
 str(filterGroupByAggrRuleOutput)
 ```
 * <Explanation of output format>
 
 ### Permitted aggregation functions
 
+<!-- ### Rule sequences -->
 
-## Executing rules written in the *DRL* format
+<!-- ## Executing rules written in the *DRL* format -->
 
-## Executing rules written in the *DT* format
+<!-- ## Executing rules written in the *DT* format -->
 
 
 # An example

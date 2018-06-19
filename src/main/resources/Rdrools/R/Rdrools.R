@@ -309,7 +309,7 @@ formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,
     ruleValue <- paste0("Rule",ruleNum,"Value")
     if(aggregationFunc != "compare" && aggregationFunc != ""){
       #agg on whole column  
-      outputFormatted <- outputDf%>%slice(n())
+      outputFormatted <- as_tibble(outputDf%>%slice(n()))
       ifelse(outputFormatted[,ruleName][1,]=='true',outputDf[c(1:nrow(outputDf)), ruleName] <-"true",outputDf[c(1:nrow(outputDf)), ruleName]  <- "false")
       
       outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
