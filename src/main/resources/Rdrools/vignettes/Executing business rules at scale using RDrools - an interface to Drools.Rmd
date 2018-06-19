@@ -1,0 +1,135 @@
+---
+title: "Executing business rules at scale using RDrools - an interface to Drools"
+author: "Naren Srinivasan"
+date: "6/19/2018"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Executing business rules at scale using RDrools - an interface to Drools}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Rdrools)
+```
+
+# Introduction
+
+## Objectives of *Rdrools*
+
+The Rdrools package aims to accomplish two main objectives:
+
+* Allow data scientists an intuitive interface to **execute business rules on datasets for the purpose of analysis**, while leveraging the Drools rule engine
+* Provide a direct interface to *Drools* for executing all types of rules defined in *Drools* formats - *.drl* and *.dt*
+
+## The advantages of a rule engine
+
+## Where to use RDrools
+
+# Running rules on **Rdrools**
+
+## Executing rules on a dataset
+
+In order to achieve the objective of providing data scientists an intuitive interface to execute rules on datasets, the Rdrools package exposes the *executeRulesOnDataset* function, which is explicitly designed for data scientists. As input to this function rules are defined using the typical language of data science with verbs such as
+* *filter*
+* *group by*
+* *aggregate*
+
+Additionally, defined rules can be executed as a sequence, with the result of one rule feeding into another
+
+For ease of use, the rules can be defined in a *csv* format, with a familiar structure using the verbs discussed earlier. We take the example of the iris dataset and define rules on it. The sample rules for the iris dataset are defined in the *irisRules.csv*
+
+```{r}
+data(iris)
+sampleRules <- read.csv("../data/SampleRules/irisRules.csv")
+rownames(sampleRules) <- seq(1:nrow(sampleRules))
+sampleRules[is.na(sampleRules)]    <-""
+sampleRules
+```
+
+Through this function, various typical types of rules can be executed as combination of the **verbs** described above.
+
+### Applying a simple filter
+
+The first type of rule is applying a simple filter based on condition on a particular column. This is done by specifying the full condition under the filter column.
+
+In the case of the **iris** dataset, we filter out a specific type of *Species*. To illustrate this case, we apply only rule 1.
+
+```{r}
+filterRule <- sampleRules[1,]
+filterRuleOutput <- executeRulesOnDataset(iris, filterRule)
+str(filterRuleOutput)
+```
+* <Explanation of output format>
+
+### Applying a condition on aggregated grouped data
+
+The second type of rule is to apply a condition on the aggregated value of metric for diffferent groups. In the case of the **iris** dataset, we aggregate the *Sepal.Length* variable across different *Species*, and identify the *Species* which have an average *Sepal.Length* greater than a threshold value. 
+
+To illustrate this case, we apply only rule 2 from the set of sample rules.
+
+```{r}
+groupedAggregationRule <- sampleRules[2,]
+groupedAggregationRuleOutput <- executeRulesOnDataset(iris, groupedAggregationRule)
+str(groupedAggregationRuleOutput)
+```
+* <Explanation of output format>
+
+### Applying an aggregation on a column
+
+This type of rule allows the data scientist to aggregate an entire column and compare that with a threshold value.
+In the case of the **iris** dataset, we aggregate the *Sepal.Length* variable across all cases, and check if it is less than a threshold value
+
+To illustrate this case, we apply only rule 3 from the set of sample rules.
+
+
+```{r}
+columnAggregationRule <- sampleRules[3,]
+columnAggregationRuleOutput <- executeRulesOnDataset(iris, columnAggregationRule)
+str(columnAggregationRuleOutput)
+```
+* <Explanation of output format>
+
+### Applying a filter with aggregation
+
+In this case, we apply a filter, and then on the filtered data, aggregate a column and compare it to a threshold value. In the case of the **iris** dataset, we we check if for cases with *Sepal.Width* > 3, if the average *Sepal.Length* is greater than 5
+
+To illustrate this case, we apply only rule 4 from the set of sample rules.
+
+```{r}
+filterColAggregationRule <- sampleRules[4,]
+filterColAggregationRuleOutput <- executeRulesOnDataset(iris, filterColAggregationRule)
+str(filterGroupByAggrRuleOutput)
+```
+
+### Applying a filter with grouped aggregation
+
+We now combine all types if verbs into one rule. In *iris* dataset, we check if for all cases with *Petal.Width* greater than a threshold value, if each type of *Species* [which is a group] has an average *Petal.Length* greater than another threshold.
+
+To illustrate this case, we apply only rule 5 from the set of sample rules.
+
+```{r}
+filterGroupByAggrRule <- sampleRules[5,]
+filterGroupByAggrRuleOutput <- executeRulesOnDataset(iris2, filterGroupByAggrRule)
+str(filterGroupByAggrRuleOutput)
+```
+* <Explanation of output format>
+
+### Permitted aggregation functions
+
+
+## Executing rules written in the *DRL* format
+
+## Executing rules written in the *DT* format
+
+
+# An example
+
+## The problem
+
+## Defining the rules file
+
+## Viewing results
+
+# References
