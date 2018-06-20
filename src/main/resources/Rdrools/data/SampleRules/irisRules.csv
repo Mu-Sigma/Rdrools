@@ -1,6 +1,8 @@
 Filters,GroupBy,Column,Function,Operation,Argument
 Species == 'setosa',,,,,
-,Species,SepalLength,average,>=,5.9
-,,SepalLength,average,<,5
-SepalWidth > 3,,SepalLength,average,>=,5
-PetalWidth > 0.4,Species,PetalLength,average,<,5
+,Species,Sepal.Length,average,>=,5.9
+,,Sepal.Length,average,<,5
+Sepal.Width > 3,,Sepal.Length,average,>=,5
+Petal.Width > 0.4,Species,Petal.Length,average,<,5
+,,Petal.Length,compare,>=,Sepal.Width
+Species == 'versicolor',,Petal.Length,compare,>=,Sepal.Width

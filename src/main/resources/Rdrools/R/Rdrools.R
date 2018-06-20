@@ -58,7 +58,7 @@ executeRulesOnDataset <- function(dataset,rules){
     aggregationFunc <-noquote( rules[i,"Function"])
     operation <-  rules[i,"Operation"]
     argument <- rules[i,"Argument"]
-
+    
     # checking if there are more than one group by
     if(unlist(gregexpr(pattern =',',groupbyColumn))!=-1 && groupbyColumn!=""){
       n <- length(unlist(gregexpr(pattern =',',groupbyColumn)))
@@ -81,8 +81,7 @@ executeRulesOnDataset <- function(dataset,rules){
       
       if(aggregationFunc=="compare"){
         #Rules having compare and no filter
-        
-        accumulateCondition <- paste0('result:HashMap(Double.valueOf(this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
+        accumulateCondition <- NULL
         
       }else if(aggregationFunc!=""){
         #Rules having no compare and no filter i.e. aggregation on a column
@@ -123,13 +122,10 @@ executeRulesOnDataset <- function(dataset,rules){
     #adding the condition for displaying output columns 
     drlRules <-  append(drlRules, outputCols)
     ruleValue <- paste0("Rule",i,"Value")
-    if(aggregationFunc=="compare"){
-      drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",i,"\",'",aggregateCoulmn,operation,argument,"');")  
-      drlRules[length(drlRules)+1] <- paste0("output.put(",shQuote(ruleValue),",result);")  
-    }else{
-      drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",i,"\",result",operation,argument,");")      
-      drlRules[length(drlRules)+1] <- paste0("output.put(",shQuote(ruleValue),",result);")  
-    }
+    
+    drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",i,"\",result",operation,argument,");")      
+    drlRules[length(drlRules)+1] <- paste0("output.put(",shQuote(ruleValue),",result);")  
+    
     drlRules[length(drlRules)+1] <-'end'
     rulesList[[i]] <- drlRules
     csvFormatOfEachRule[[i]] <- rules[i,]
@@ -146,6 +142,11 @@ executeRulesOnDataset <- function(dataset,rules){
       if(aggregationFunc==""){#only filter
         outputDf[[i]] <- filteredData
         filteredDataFalse <- NULL
+      }else if(aggregationFunc == "compare"){
+        inputData <- filteredDataTrue
+        drlRules <- ruleToCompareColumns(dataset = dataset,rules = rules ,ruleNum = i)
+        rules.Session <- rulesSession(unlist(drlRules),input.columns,output.columns)
+        outputDf[[i]] <- runRules(rules.Session,inputData)  
       }else{
         inputData <- filteredDataTrue
         rules.Session <- rulesSession(unlist(drlRules),input.columns,output.columns)
@@ -154,12 +155,15 @@ executeRulesOnDataset <- function(dataset,rules){
       }
       
     }else{
-      print(drlRules)
+      
       inputData <- dataset
       filteredDataFalse <- NULL
+      if(aggregationFunc=="compare"){
+        drlRules <- ruleToCompareColumns(dataset = dataset,rules = rules ,ruleNum = i)
+      }
       rules.Session <- rulesSession(unlist(drlRules),input.columns,output.columns)
       outputDf[[i]] <- runRules(rules.Session,inputData)  
-      print(outputDf)
+      
       
     }
     
@@ -167,7 +171,7 @@ executeRulesOnDataset <- function(dataset,rules){
     outputDfForEachRule[[i]] <- formatOutput(dataset = dataset,outputDf = outputDf[[i]],rules = rules,filteredDataFalse =filteredDataFalse ,input.columns=input.columns,ruleNum=i)[[2]]
     
   }
-
+  
   intermediateOutput <- list(rep(NULL, nrow(rules)))
   
   output <- mapply(list,
@@ -298,6 +302,44 @@ getDrlForFilterRules <- function(dataset,rules,ruleNum,outputCols,input.columns,
   
   return(filteredOutput)
 }
+
+
+
+
+ruleToCompareColumns <- function(dataset,rules,ruleNum){
+  
+  aggregateCoulmn <- rules[ruleNum,"Column"]
+  operation <-  rules[ruleNum,"Operation"]
+  argument <-rules[ruleNum,"Argument"]
+  compareCondition <- paste0('result:HashMap(Double.valueOf(this["',aggregateCoulmn,'"]) ',operation,' Double.valueOf(this["',argument,'"]))')
+  drlRules <-list(
+    'import java.util.HashMap',
+    'import java.lang.Double',
+    'global java.util.HashMap output',
+    "",
+    '  dialect "mvel"',
+    # Rules name
+    paste0("rule \"Rule",ruleNum,"\""),
+    '       salience 0',
+    '       when',
+    '        input: HashMap()',
+    #filtering
+    compareCondition,
+    'then'
+  )
+  outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x, "',result.get('",x,"'));"))
+  
+  
+  drlRules <-  append(drlRules, outputCols)
+  ruleValue <- paste0("Rule",ruleNum,"Value")  
+  drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",ruleNum,"\"",", \"\"+","\"true\"",");")
+  drlRules[length(drlRules)+1] <- paste0("output.put(",shQuote(ruleValue),",result);")  
+  drlRules[length(drlRules)+1] <-'end'
+  return(drlRules)
+  
+}
+
+
 
 
 
