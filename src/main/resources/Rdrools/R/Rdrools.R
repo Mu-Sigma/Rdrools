@@ -31,18 +31,24 @@
 #' @return rules in drl format, output dataframe 
 #' 
 executeRulesOnDataset <- function(dataset,rules){
-  
+  #adding row numbers to the dataframe
   dataset$rowNumber <- 1:nrow(dataset)
+  rules <-changecolnamesInRules(dataset = dataset, rules = rules )
+  #converting factors to character
+  rules[] <- lapply(rules, as.character)
+  #getting input and output columns
+  input.columns <- getrequiredColumns(dataset,rules)[[1]]
+  output.columns <- getrequiredColumns(dataset,rules)[[2]]
+  #changing the column names of the dataset by removing . or _ present in the column names
+  colnames(dataset) <- input.columns
   rulesList <- list()
   outputCols <- list()
   # Getting the required format to display output columns
   outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x, "',input.get('",x,"'));"))
-  perRule <- list()
+  csvFormatOfEachRule <- list()
   outputDf <- list()
+  outputWithAllRows <- list()
   outputDfForEachRule <- list()
-  input.columns <- getrequiredColumns(dataset,rules)[[1]]
-  output.columns <- getrequiredColumns(dataset,rules)[[2]]
-  metaDataperRule <- list()
   # Running the loop to get drl format for all the rules
   
   for(i in 1:nrow(rules)){
@@ -52,8 +58,7 @@ executeRulesOnDataset <- function(dataset,rules){
     aggregationFunc <-noquote( rules[i,"Function"])
     operation <-  rules[i,"Operation"]
     argument <- rules[i,"Argument"]
-    #paste("Rule",i) <- list()
-    
+
     # checking if there are more than one group by
     if(unlist(gregexpr(pattern =',',groupbyColumn))!=-1 && groupbyColumn!=""){
       n <- length(unlist(gregexpr(pattern =',',groupbyColumn)))
@@ -63,7 +68,6 @@ executeRulesOnDataset <- function(dataset,rules){
         groupbyColumn <- unlist(strsplit(unlist(groupbyColumn),","))
         groupbyCondition <- paste0(groupbyColumn,'==input.get("',groupbyColumn,'")')
         groupbyCondition <-paste0(groupbyCondition,collapse = ",")
-        
         
         #condition when there is no filter
         
@@ -128,8 +132,7 @@ executeRulesOnDataset <- function(dataset,rules){
     }
     drlRules[length(drlRules)+1] <-'end'
     rulesList[[i]] <- drlRules
-    perRule[[i]] <- rules[i,]
-    
+    csvFormatOfEachRule[[i]] <- rules[i,]
     
     if(filterData != ""){
       
@@ -151,27 +154,26 @@ executeRulesOnDataset <- function(dataset,rules){
       }
       
     }else{
+      print(drlRules)
       inputData <- dataset
       filteredDataFalse <- NULL
-      
       rules.Session <- rulesSession(unlist(drlRules),input.columns,output.columns)
       outputDf[[i]] <- runRules(rules.Session,inputData)  
+      print(outputDf)
       
     }
     
-    outputDfForEachRule[[i]] <- formatOutput(dataset = dataset,outputDf = outputDf[[i]],rules = rules,filteredDataFalse =filteredDataFalse ,input.columns=input.columns,ruleNum=i)$outputDf
-    metaDataperRule[[i]] <- formatOutput(dataset = dataset,outputDf = outputDf[[i]],rules = rules,filteredDataFalse =filteredDataFalse ,input.columns=input.columns,ruleNum=i)[[2]]
+    outputWithAllRows[[i]] <- formatOutput(dataset = dataset,outputDf = outputDf[[i]],rules = rules,filteredDataFalse =filteredDataFalse ,input.columns=input.columns,ruleNum=i)$outputDf
+    outputDfForEachRule[[i]] <- formatOutput(dataset = dataset,outputDf = outputDf[[i]],rules = rules,filteredDataFalse =filteredDataFalse ,input.columns=input.columns,ruleNum=i)[[2]]
     
   }
+
   intermediateOutput <- list(rep(NULL, nrow(rules)))
-  outputList <-list(perRule=perRule,
-                    intermediateOutput = intermediateOutput,
-                    outputPerRule=metaDataperRule)
   
   output <- mapply(list,
-                   input=perRule,
+                   input=csvFormatOfEachRule,
                    intermediateOutput = intermediateOutput,
-                   output=metaDataperRule, SIMPLIFY = F)
+                   output=outputDfForEachRule, SIMPLIFY = F)
   return(output)
   
 }
@@ -186,16 +188,18 @@ executeRulesOnDataset <- function(dataset,rules){
 #' @return required input columns and output columns
 #' 
 getrequiredColumns <- function(dataset,rules){
+  #removing the . or _ in the column names of the dataset
+  colnames(dataset) <- gsub('\\.|\\_', '', colnames(dataset))
   input.columns <- colnames(dataset)
   output.columns <-list()
   valueColumns <- list()
   j<- ncol(dataset)
-  #adding each column for each rule
+  #adding one column for each rule
   output.columns<-lapply(1:nrow(rules), function(i){
     output.columns[j+i] <- paste0("Rule",i)
     
   })
-  
+  #adding columns to store the result value for each rule
   valueColumns<-lapply(1:nrow(rules), function(n){
     valueColumns[n] <- paste0("Rule",n,"Value")
     
@@ -207,6 +211,29 @@ getrequiredColumns <- function(dataset,rules){
   return(list(input.columns=input.columns,output.columns=output.columns))
 }
 
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to remove the . or _ in column names of the dataset present 
+#' in the rules file
+#' -----------------------------------------------------------------------------
+#' @param dataset rules defined in a csv file
+#' @param rules dataframe 
+#' -----------------------------------------------------------------------------
+#' @return rules in required format
+#' 
+
+changecolnamesInRules <-function(dataset,rules){
+  
+  formattedRules <- rules
+  for (col.name in colnames(dataset)) {
+    formattedRules<-data.frame(
+      lapply(formattedRules, function(x){
+        gsub(pattern = col.name, #checking for the column names of dataset present in rules
+             replacement = gsub(pattern = "\\.|\\_",replacement = "",col.name),
+             x)}))#replacing the . or _ 
+  }
+  return(formattedRules)
+  
+}
 
 
 #' -----------------------------------------------------------------------------
@@ -228,8 +255,10 @@ getDrlForFilterRules <- function(dataset,rules,ruleNum,outputCols,input.columns,
   #this fucntion is used to create rules in drl for the rules which involve only filters
   #this is done by creating the complementary rule for the given filter and then labelling the true/false
   filterData <- rules[ruleNum,"Filters"]
+  #filter given
   condition <- paste0("input:HashMap(",filterData,")")
   ruleValue <- paste0("Rule",ruleNum,"Value")
+  #defining the complementary condition for the filter given
   compcondition <- paste0("input:HashMap(!(",filterData,"))")
   outputforFilter <- paste0("output.put(\"Rule",ruleNum,"\"",", \"\"+","\"true\"",");")
   
@@ -263,7 +292,7 @@ getDrlForFilterRules <- function(dataset,rules,ruleNum,outputCols,input.columns,
   drlRules[length(drlRules)+1] <- paste0("output.put('",ruleValue,"',",shQuote(paste("Not",filterData)),");")
   drlRules[length(drlRules)+1] <-'end'
   
-  
+  #calling the rulessession
   filteredOutputSession <- rulesSession(drlRules,input.columns,output.columns=output.columns)
   filteredOutput <- runRules(filteredOutputSession,dataset)
   
@@ -284,107 +313,70 @@ getDrlForFilterRules <- function(dataset,rules,ruleNum,outputCols,input.columns,
 #' @return output in required format
 #' 
 formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,ruleNum){
-  #addign row number as a column to identify the last and first row for each group
+  #adding row number as a column to identify the last and first row for each group
   groupbyColumn  <- rules[ruleNum,"GroupBy"]
   aggregationFunc <-noquote( rules[ruleNum,"Function"])
+  ruleName <- paste0("Rule",ruleNum)
+  ruleValue <- paste0("Rule",ruleNum,"Value")
   
   if(groupbyColumn!=""){
-    ruleName <- paste0("Rule",ruleNum)
-    ruleValue <- paste0("Rule",ruleNum,"Value")
+    
     #getting the first and last row for each group
-    
-    
     outputFormatted <-  eval(parse(text=paste('outputDf%>%group_by(',groupbyColumn,')%>%slice(c(1,n()))%>%ungroup()')))  
-    metaDataperRule <- eval(parse(text=paste('outputDf%>%group_by(',groupbyColumn,')%>%slice(c(n()))%>%ungroup()')))
-    metaDataperRule$Indices <- 0
-    for(j in 1:nrow(metaDataperRule)){
+    #getting the last row for each group
+    outputDfForEachRule <- eval(parse(text=paste('outputDf%>%group_by(',groupbyColumn,')%>%slice(c(n()))%>%ungroup()')))
+    #adding new column, Indices
+    outputDfForEachRule$Indices <- 0
+    for(j in 1:nrow(outputDfForEachRule)){
       lowerRange<-outputFormatted[2*j-1,"rowNumber"]
       upperRange <- outputFormatted[2*j,"rowNumber"]
       #setting all the rows of group as true/false according to the last row of each group
       ifelse(outputFormatted[,ruleName][2*j,]=='true',outputDf[c(as.numeric(lowerRange):as.numeric(upperRange)), ruleName] <-"true",outputDf[c(as.numeric(lowerRange):as.numeric(upperRange)), ruleName]  <- "false")
+      #getting the required columns from the output
       outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
-      
+      #adding the filtered out rows with flag False to the final output
       outputDf <- rbind(outputDf,filteredDataFalse)
-      #getting the required ciolumns from the output
       groupbyColumn <-unlist(strsplit(groupbyColumn,","))
-      metaDataperRule <- metaDataperRule[,c(groupbyColumn,ruleName,"Indices")]
-      
-      metaDataperRule[j,"Indices"]<-paste(seq(as.numeric(lowerRange),as.numeric(upperRange)),collapse = ",")
-      metaDataperRule <- metaDataperRule[,c(groupbyColumn,"Indices",ruleName)]
+      outputDfForEachRule <- outputDfForEachRule[,c(groupbyColumn,ruleName,"Indices")]
+      #getting the Indices of each group
+      outputDfForEachRule[j,"Indices"]<-paste(seq(as.numeric(lowerRange),as.numeric(upperRange)),collapse = ",")
+      outputDfForEachRule <- outputDfForEachRule[,c(groupbyColumn,"Indices",ruleName)]
       
     }  
   }else{
-    ruleName <- paste0("Rule",ruleNum)
-    ruleValue <- paste0("Rule",ruleNum,"Value")
+    
     if(aggregationFunc != "compare" && aggregationFunc != ""){
       #agg on whole column  
+      #getting the last row
       outputFormatted <- outputDf%>%slice(n())
       
       ifelse(outputFormatted[,ruleName][1,]=='true',outputDf[c(1:nrow(outputDf)), ruleName] <-"true",outputDf[c(1:nrow(outputDf)), ruleName]  <- "false")
-      
+      #getting the required columns
       outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
       outputDf <- rbind(outputDf,filteredDataFalse)
-      metaDataperRule <- outputFormatted
-      metaDataperRule$Group <- 1
-      metaDataperRule$Indices <- paste(outputDf[,"rowNumber"],collapse = ",")
-      metaDataperRule <- metaDataperRule[,c("Group","Indices",ruleName)]
+      outputDfForEachRule <- outputFormatted
+      outputDfForEachRule$Group <- 1
+      outputDfForEachRule$Indices <- paste(outputDf[,"rowNumber"],collapse = ",")
+      outputDfForEachRule <- outputDfForEachRule[,c("Group","Indices",ruleName)]
       
     }else{
-      ruleName <- paste0("Rule",ruleNum)
-      ruleValue <- paste0("Rule",ruleNum,"Value")
-      #filterData <- rules[i,"Filters"]
+      
       outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
       outputDf <- rbind(outputDf,filteredDataFalse)
-      metaDataperRule <- outputDf
-      metaDataperRule$Group <-outputDf$rowNumber
-      metaDataperRule$Indices <- outputDf$rowNumber
-      
-      metaDataperRule <- metaDataperRule[,c("Group","Indices",ruleName)]
+      outputDfForEachRule <- outputDf
+      outputDfForEachRule$Group <-outputDf$rowNumber
+      outputDfForEachRule$Indices <- outputDf$rowNumber
+      outputDfForEachRule <- outputDfForEachRule[,c("Group","Indices",ruleName)]
       
     }
     
   }
-  metaDataperRule <- setNames(metaDataperRule, c("Group","Indices","IsTrue"))
+  outputDfForEachRule <- setNames(outputDfForEachRule, c("Group","Indices","IsTrue"))
   
-  return(list(outputDf=outputDf,metaDataperRule=metaDataperRule))
+  return(list(outputDf=outputDf,outputDfForEachRule=outputDfForEachRule))
 }
 
 
-
-#' -----------------------------------------------------------------------------
-#' @description: This function ris used to get the rule wise output
-#'               
-#' -----------------------------------------------------------------------------
-#' @param dataset rules defined in a csv file
-#' @param outputDf output returned by the executeRulesOnDataset function
-#' @param rules rules in csv format 
-#' -----------------------------------------------------------------------------
-#' @return rule wise output
-#' 
-
-getRuleWiseData <-function(dataset,outputDf,rules,ruleNum){
-  # outputForAllRules <-list()
-  #outputForAllRules <- map(1:nrow(rules),function(i){
-  groupbyColumn  <- rules[ruleNum,"GroupBy"]
-  ruleName <- paste0("Rule",ruleNum)
-  if(groupbyColumn!=""){
-    
-    metaDataperRule <- eval(parse(text=paste('outputDf%>%group_by(',groupbyColumn,')%>%slice(c(n()))%>%ungroup()')))
-    outputFormatted <-  eval(parse(text=paste('outputDf%>%group_by(',groupbyColumn,')%>%slice(c(1,n()))%>%ungroup()')))  
-    #getting the required ciolumns from the output
-    groupbyColumn <-unlist(strsplit(groupbyColumn,","))
-    metaDataperRule <- metaDataperRule[,c(groupbyColumn,ruleName,"rowNumber")]
-    metaDataperRule$Indices <- 0
-    
-  }else{
-    #getting the required colums from the output
-    metaDataperRule <- outputDf
-  }
-  
-  
-  
-  return(metaDataperRule)
-}
 #' -----------------------------------------------------------------------------
 #' @description: This function is used to call the drools session for rules that are in drl format
 #'               
