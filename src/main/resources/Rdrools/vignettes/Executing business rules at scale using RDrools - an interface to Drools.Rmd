@@ -1,6 +1,6 @@
 ---
 title: "Executing business rules at scale using RDrools - an interface to Drools"
-author: "Naren Srinivasan"
+author: "Naren Srinivasan, Dheekshitha PS"
 date: "6/19/2018"
 output: rmarkdown::html_vignette
 vignette: >
@@ -63,7 +63,7 @@ For ease of use, the rules can be defined in a *csv* format, with a familiar str
 
 ```{r}
 data(iris)
-colnames(iris) <- c("SepalLength", "SepalWidth",  "PetalLength", "PetalWidth", "Species")
+
 sampleRules <- read.csv("../data/SampleRules/irisRules.csv")
 rownames(sampleRules) <- seq(1:nrow(sampleRules))
 sampleRules[is.na(sampleRules)]    <-""
@@ -83,7 +83,17 @@ filterRule <- sampleRules[1,]
 filterRuleOutput <- executeRulesOnDataset(iris, filterRule)
 str(filterRuleOutput)
 ```
-* <Explanation of output format>
+
+The output has three objects:  
+
+* input: has the rule defined  by the user in a dataframe
+* intermediateOutput : intermediate output especially in case of sequential rules
+* output: has the output dataframe with 3 columns:
+    * Group: the above rule has no group by and hence the rule is applied row wise. Group in this case represents the row number
+    * Indices: the row numbers of the dataframe
+    * IsTrue: flag to say if the datapoint is satisfying the rule or not. IN this case, Flag is *true* if the Species is setosa and *false* if it's not setosa
+
+
 
 ### Applying a condition on aggregated grouped data
 
@@ -96,7 +106,17 @@ groupedAggregationRule <- sampleRules[2,]
 groupedAggregationRuleOutput <- executeRulesOnDataset(iris, groupedAggregationRule)
 str(groupedAggregationRuleOutput)
 ```
-* <Explanation of output format>
+
+The output has three objects:
+  
+* input: has the rule defined  by the user in a dataframe
+* intermediateOutput : intermediate output especially in case of sequential rules
+* output: has the output dataframe with 3 columns:
+    * Group: the above rule has group by and hence the rule is applied on each group. Group in this case represents the column groupedby, Species
+    * Indices: the row numbers of each group
+    * IsTrue: flag to say if the datapoint is satisfying the rule or not. IN this case, Flag is *true* if the aggregated value is greater than or equal to .5.9 and *false* if it's not
+
+
 
 ### Applying an aggregation on a column
 
@@ -111,7 +131,15 @@ columnAggregationRule <- sampleRules[3,]
 columnAggregationRuleOutput <- executeRulesOnDataset(iris, columnAggregationRule)
 str(columnAggregationRuleOutput)
 ```
-* <Explanation of output format>
+
+The output has three objects:
+
+* input: has the rule defined  by the user in a dataframe
+* intermediateOutput : intermediate output especially in case of sequential rules
+* output: has the output dataframe with 3 columns:
+    * Group: the above rule has no group by and no filter. The rule is applied on the whole column. Group in this case represents the whole column
+    * Indices: the row numbers of the whole dataframe
+    * IsTrue: flag to say if the datapoint is satisfying the rule or not. IN this case, Flag is *true* if the aggregated value is greater than 5 and *false* if it's not
 
 ### Applying a filter with aggregation
 
@@ -125,6 +153,15 @@ filterColAggregationRuleOutput <- executeRulesOnDataset(iris, filterColAggregati
 str(filterColAggregationRuleOutput)
 ```
 
+The output has three objects:
+
+* input: has the rule defined  by the user in a dataframe
+* intermediateOutput : intermediate output especially in case of sequential rules
+* output: has the output dataframe with 3 columns:
+    * Group: the above rule has no group by and hence the rule is applied on whole column after filtering the data. Group in this case represents the whole column 
+* Indices: the row numbers of the whole dataframe
+    * IsTrue: flag to say if the datapoint is satisfying the rule or not. In this case, Flag is *true* if the aggregated value of the filtered data is greater than or equal to 5  and *false* if it's not
+    
 ### Applying a filter with grouped aggregation
 
 We now combine all types if verbs into one rule. In *iris* dataset, we check if for all cases with *Petal.Width* greater than a threshold value, if each type of *Species* [which is a group] has an average *Petal.Length* greater than another threshold.
@@ -136,23 +173,122 @@ filterGroupByAggrRule <- sampleRules[5,]
 filterGroupByAggrRuleOutput <- executeRulesOnDataset(iris, filterGroupByAggrRule)
 str(filterGroupByAggrRuleOutput)
 ```
-* <Explanation of output format>
 
-### Permitted aggregation functions
+The output has three objects:
 
-<!-- ### Rule sequences -->
+* input: has the rule defined  by the user in a dataframe
+* intermediateOutput : intermediate output especially in case of sequential rules
+* output: has the output dataframe with 3 columns:
+    * Group: the above rule has group by and filter. Hence the rule is applied on each group after filtering the data. Group in this case represents the groupedby column, Species
+* Indices: the row numbers of the each group
+    * IsTrue: flag to say if the datapoint is satisfying the rule or not. In this case, Flag is *true* if the aggregated value of the filtered data is less than or equal to 5  and *false* if it's not
 
-<!-- ## Executing rules written in the *DRL* format -->
 
-<!-- ## Executing rules written in the *DT* format -->
+# Use case
+
+## Problem statement
+
+Consider the customers of a retail bank, who make transactions against their bank account for different purposes such as shopping, money transfers, etc. In the banking system, there is a huge potential for fraud, with abnormal transaction behavior indicative of this. 
+
+We explore how such transactions can be monitored intelligently to detect fraud using Rdrools by applying business rules.
+
+## Details of the dataset 
+
+The following dataset provides transaction data for multiple customers of the retail bank (identified by their *Account IDs*) is used. Every transaction that a user (account) does is recorded with the following details:
+
+  + *Transaction ID*: unique code for each transaction
+  + *Transaction Amount*: the amount debited or credited in each transaction
+  + *trans_tender_type*: tells if the transaction is a deposit or loan repayment or if it is an overseas transaction                       
+  + *Credit card details*: the monthly credit card expenditure 
+  + *Transaction_Channel*: the mode of transaction like ATM or card swipe etc
+  + *Balance*: the amount in the account after each transaction
+  + *Total transactions*: number of transactions done by the customer in each month and the cumulative number of transactions
+
+```{r,warning=FALSE}
+transactionData <- read.csv("/home/dheekshitha/Desktop/Rdrools_Dev/Rdrools/src/main/resources/Rdrools/data/SampleDataset/TransactionsData.csv",stringsAsFactors = F)
+transactionData$Date <- ymd(transactionData$Date)
+transactionData <- transactionData[1:500,]
+```
+
+## Displaying a sample (top 10 rows) of the uploaded dataset
+
+```{r,echo=FALSE,warning=FALSE}
+datatable(
+  head(transactionData, 20), extensions = 'FixedColumns',
+  options = list(
+  dom = 't',
+  scrollX = TRUE,
+  scrollCollapse = TRUE
+))
+```
 
 
-# An example
+------
+```{r,echo=FALSE}
+str(transactionData)
 
-## The problem
+```
+
+------
+
+
 
 ## Defining the rules file
 
+There might be certain cases where we simply want to check the behavior of customers based on a constant benchmark value. These might be cases such as compliance and policy violations, etc. 
+
+In our case we check rules like:
+
+
+  + If the number of transactions done by the customer in a month exceeds more than 20 then the customer can be fraudulent
+  + If the transaction amount exceeds the more than a threshold then the account can be fraudulent
+  
+
+
+```{r}
+transactionRules <- read.csv("/home/dheekshitha/Desktop/Rdrools_Dev/Rdrools/src/main/resources/Rdrools/data/SampleRules/workingRules.csv")
+rownames(transactionRules) <- seq(1:nrow(transactionRules))
+transactionRules[is.na(transactionRules)]    <-""
+transactionRules
+
+```
+
+One example of the rules to mark anomalous transactions from the above list is
+
+$$\textsf{For an account, the total Transaction_Amount } \\  \textsf{should be greater than or equal to USD 40,000}$$ 
+
+
+
+## Executing rules on dataset
+
+The rules can be executed on the transaction data as follows.
+```{r}
+
+transactionDataOutput  <- executeRulesOnDataset(transactionData, transactionRules)
+
+```
+
 ## Viewing results
 
+```{r,message=NA}
+str(transactionDataOutput[[5]])
+```
+ Let us take the results obtained for *Rule5* to understand the applications of Rdrools. The *Rule5* was
+
+$$\textsf{For an account, the maximum of Transaction_Amount } \\  \textsf{should be greater than or equal to USD 40,000 for all the debit transactions done after 2017-05-01}$$ 
+The output has three objects:
+
+* input: has the rule defined  by the user in a dataframe
+* intermediateOutput : intermediate output especially in case of sequential rules
+* output: has the output dataframe with 3 columns:
+    * Group: 
+    The rule says to find the transactions done by each *Account_ID*, which implies that the data is to be groupedby *Account_Id*. Hence group here represents the *Account_ID*.
+    * Indices: the row numbers of the dataframe under each *Account_ID* 
+    * IsTrue: flag to say if the *Account_ID* is anomalous or not. 
+
+
 # References
+
+[Drools Documentation](https://docs.jboss.org/drools/release/6.2.0.CR1/drools-docs/html_single/)
+
+[Rdrools Documentation]( https://cran.r-project.org/web/packages/Rdrools/Rdrools.pdf )

@@ -1,8 +1,6 @@
 Filters,GroupBy,Column,Function,Operation,Argument,caseSensitive
+Credit_Card_Monthly_Expenditure > 28000,,,,,,
 ,"Account_ID,Month",Transaction_Amount,sum,>=,10000,""""""
-risk_level == 'High',"Account_ID,Month",Transaction_ID,count,>,5,""""""
-Date > '2017-05-01' && Credit_Debit_Indicator == 'Debit',Account_ID,Total_Transactions,min,>,5,""""""
-,Account_ID,Balance,max,>,5,""""""
-Credit_Debit_Indicator == 'Debit',,,,,,
-,,Transaction_Amount,sum,>=,10000000,
+,,Total_Transactions,max,>,5,
 risk_level == 'Low',,Transaction_Amount,average,<,1400,
+Date > '2017-05-01' && Credit_Debit_Indicator == 'Debit',Account_ID,Transaction_Amount,sum,>=,40000,""""""
