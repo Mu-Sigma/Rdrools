@@ -20,7 +20,6 @@
 }
 
 
-
 #' -----------------------------------------------------------------------------
 #' @description: This function is used to convert the rules data uploaded into required format
 #'               
@@ -339,11 +338,6 @@ ruleToCompareColumns <- function(dataset,rules,ruleNum){
   
 }
 
-
-
-
-
-
 #' -----------------------------------------------------------------------------
 #' @description: This function is used to change the output of the rules involving groupby
 #'               
@@ -435,25 +429,6 @@ rulesSessionDrl <- function(rules,input.columns, output.columns) {
   output.columns <- paste(output.columns,collapse=',')
   droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
   return(droolsSession)
-}
-
-#' -----------------------------------------------------------------------------
-#' @description: This function is used to call the drools session for rules that are in decision table format
-#'               
-#' -----------------------------------------------------------------------------
-#' @param rulesDT rules defined in a decision table
-#' @param input.columns input columns of the dataframe
-#' @param output.columns required output columns
-#' -----------------------------------------------------------------------------
-#' @return drools session
-#' 
-rulesSessionDT<-function(rulesDT,input.columns,output.columns){
-  
-  
-  
-  
-  
-  
 }
 
 
