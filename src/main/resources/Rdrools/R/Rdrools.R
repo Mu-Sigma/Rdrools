@@ -405,7 +405,7 @@ formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,
     if(aggregationFunc != "compare" && aggregationFunc != ""){
       #agg on whole column  
       #getting the last row
-      outputFormatted <- outputDf%>%slice(n())
+      outputFormatted <- as_tibble(outputDf) %>% slice(n())
       
       ifelse(outputFormatted[,ruleName][1,]=='true',outputDf[c(1:nrow(outputDf)), ruleName] <-"true",outputDf[c(1:nrow(outputDf)), ruleName]  <- "false")
       #getting the required columns
