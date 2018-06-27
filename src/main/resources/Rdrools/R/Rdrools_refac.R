@@ -19,6 +19,92 @@
   .jpackage(pkgname, lib.loc = libname)
 }
 
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to convert the rules data uploaded into required format
+#'               
+#' -----------------------------------------------------------------------------
+#' @param dataset rules defined in a csv file
+#' @param rules dataframe 
+#' -----------------------------------------------------------------------------
+#' @return rules in drl format, output dataframe 
+#' 
+executeRulesOnDataset <- function(dataset,rules){
+  #adding row numbers to the dataframe
+  dataset$rowNumber <- 1:nrow(dataset)
+  rules <-changecolnamesInRules(dataset = dataset, rules = rules )
+  #converting factors to character
+  rules[] <- lapply(rules, as.character)
+  #getting input and output columns
+  input.columns <- getrequiredColumns(dataset,rules)[[1]]
+  output.columns <- getrequiredColumns(dataset,rules)[[2]]
+  #changing the column names of the dataset by removing . or _ present in the column names
+  colnames(dataset) <- input.columns
+  rulesList <- list()
+  outputCols <- list()
+  # Getting the required format to display output columns
+  outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x, "',input.get('",x,"'));"))
+  csvFormatOfEachRule <- list()
+  outputDf <- list()
+  outputWithAllRows <- list()
+  outputDfForEachRule <- list()
+  
+  # Running the loop to get drl format for all the rules
+  rules %>% mutate(ruleNum = 1:nrow(.)) -> rules
+  rules %>% rowwise(.) %>% do(getRuleInDrl(.)) -> resultTib
+  inp <- resultTib$input    
+  interOut <- resultTib$intermediateOutput
+  op <- resultTib$output
+  
+  output <- mapply(list,
+             input=inp,
+             intermediateOutput = interOut,
+             output=op, SIMPLIFY = F)
+  
+  return(output)
+}
+
+
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to call the drools session for rules that are in drl format
+#'               
+#' -----------------------------------------------------------------------------
+#' @param dataset rules defined in a csv file
+#' @param input.columns input columns of the dataframe
+#' @param output.columns required output columns
+#' -----------------------------------------------------------------------------
+#' @return drools session
+#' 
+rulesSessionDrl <- function(rules,input.columns, output.columns) {
+  rules <- paste(rules, collapse='\n')
+  input.columns <- paste(input.columns,collapse=',')
+  output.columns <- paste(output.columns,collapse=',')
+  droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
+  return(droolsSession)
+}
+
+
+#' -----------------------------------------------------------------------------
+#' @description: This function is used to execute all kinds of rules (defined in csv or drl or DT format)
+#'               
+#' -----------------------------------------------------------------------------
+#' @param rules.session output fo rulesSession function
+#' @param input.df input dataframe
+#' -----------------------------------------------------------------------------
+#' @return output dataframe
+#'
+runRulesDrl<-function(rules.session,input.df) {
+  conn<-textConnection('input.csv.string','w')
+  write.csv(input.df,file=conn)
+  close(conn)
+  input.csv.string <- paste(input.csv.string, collapse='\n')
+  output.csv.string <- .jcall(rules.session, 'S', 'execute',input.csv.string)
+  conn <- textConnection(output.csv.string, 'r')
+  output.df<-read.csv(file=conn, header=T)
+  close(conn)
+  return(output.df)
+}
+
+#### Helper functions ######
 getConditionForMultiGroupBy <- function(groupByColumn, aggregationFunc, aggregationColumn){
   n <- length(unlist(gregexpr(pattern =',',groupByColumn)))
   groupByCondition <- list()
@@ -45,7 +131,7 @@ getRuleInDrl <- function(rowList){
   ruleNum <- rowList$ruleNum
   filterCond <- rowList$Filters
   groupByColumn  <-rowList$GroupBy
-  aggregrationColumn <- rowList$Column
+  aggregationColumn <- rowList$Column
   aggregationFunc <- rowList$Function
   operation <- rowList$Operation
   argument <- rowList$Argument
@@ -54,23 +140,23 @@ getRuleInDrl <- function(rowList){
   
   # checking if there are more than one group by
   if(unlist(gregexpr(pattern =',', groupByColumn)) != -1 && groupByColumn != ""){
-    accumulateCondition <- getConditionForMultiGroupBy(groupByColumn, aggregationFunc, aggregationColumn)
-  }else if(unlist(gregexpr(pattern =',', groupByColumn)) == -1 && groupByColumn == ""){#No groupby 
+      accumulateCondition <- getConditionForMultiGroupBy(groupByColumn, aggregationFunc, aggregationColumn)
+  }else if(unlist(gregexpr(pattern =',',groupByColumn))==-1 && groupByColumn==""){#No groupby 
     # Rules having no compare and no filter i.e. aggregation on a column
     # Only filter (i.e aggregationFunc is empty)
     # ^^ accumulateCondition - already set to NULL
-    if(aggregationFunc!=""){
-      accumulateCondition <-  paste0("result: Double()
-                                     from accumulate($condition:HashMap(),",
+    if(aggregationFunc != ""){
+      accumulateCondition <-  paste0("result: Double() \n ",
+                                     "from accumulate($condition:HashMap(),",
                                      aggregationFunc,
                                      "(Double.valueOf($condition.get(",shQuote(aggregationColumn),").toString())))")
     }
   }else{
-    groupByCondition <- paste0(groupByColumn,'==input.get("',groupByColumn,'")')
-    accumulateCondition <-    paste0("result: Double()
-                                     from accumulate($condition:HashMap(",groupByCondition,"),",
-                                     aggregationFunc,
-                                     "(Double.valueOf($condition.get(",shQuote(aggregationColumn),").toString())))")
+      groupByCondition <- paste0(groupByColumn,'==input.get("',groupByColumn,'")')
+      accumulateCondition <-    paste0("result: Double()
+                                       from accumulate($condition:HashMap(",groupByCondition,"),",
+                                       aggregationFunc,
+                                       "(Double.valueOf($condition.get(",shQuote(aggregationColumn),").toString())))")
   }
   
   drlRules <-list(
@@ -144,54 +230,8 @@ getRuleInDrl <- function(rowList){
   resultTibble = tibble(input = csvFormatOfEachRule,
                         intermediateOutput = intermediateOutput,
                         output=outputDfForEachRule
-                        )
+  )
   return(resultTibble)
-}
-
-
-#' -----------------------------------------------------------------------------
-#' @description: This function is used to convert the rules data uploaded into required format
-#'               
-#' -----------------------------------------------------------------------------
-#' @param dataset rules defined in a csv file
-#' @param rules dataframe 
-#' -----------------------------------------------------------------------------
-#' @return rules in drl format, output dataframe 
-#' 
-executeRulesOnDataset <- function(dataset,rules){
-  #adding row numbers to the dataframe
-  dataset$rowNumber <- 1:nrow(dataset)
-  rules <-changecolnamesInRules(dataset = dataset, rules = rules )
-  #converting factors to character
-  rules[] <- lapply(rules, as.character)
-  #getting input and output columns
-  input.columns <- getrequiredColumns(dataset,rules)[[1]]
-  output.columns <- getrequiredColumns(dataset,rules)[[2]]
-  #changing the column names of the dataset by removing . or _ present in the column names
-  colnames(dataset) <- input.columns
-  rulesList <- list()
-  outputCols <- list()
-  # Getting the required format to display output columns
-  outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x, "',input.get('",x,"'));"))
-  csvFormatOfEachRule <- list()
-  outputDf <- list()
-  outputWithAllRows <- list()
-  outputDfForEachRule <- list()
-  
-  # Running the loop to get drl format for all the rules
-  rules %>% mutate(ruleNum = 1:nrow(.)) -> rules
-  rules %>% rowwise(.) %>% do(getRuleInDrl(.)) -> resultTib
-  inp <- resultTib$input    
-  interOut <- resultTib$intermediateOutput
-  op <- resultTib$output
-  
-  output <- mapply(list,
-             input=inp,
-             intermediateOutput = interOut,
-             output=op, SIMPLIFY = F)
-  
-  return(output)
-                                                          
 }
 
 #' -----------------------------------------------------------------------------
@@ -268,7 +308,7 @@ changecolnamesInRules <-function(dataset,rules){
 
 
 getDrlForFilterRules <- function(dataset,rules,ruleNum,outputCols,input.columns,output.columns){
-  #this fucntion is used to create rules in drl for the rules which involve only filters
+  #this function is used to create rules in drl for the rules which involve only filters
   #this is done by creating the complementary rule for the given filter and then labelling the true/false
   filterData <- rules[ruleNum,"Filters"]
   #filter given
@@ -425,44 +465,3 @@ formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,
   return(list(outputDf=outputDf,outputDfForEachRule=outputDfForEachRule))
 }
 
-
-#' -----------------------------------------------------------------------------
-#' @description: This function is used to call the drools session for rules that are in drl format
-#'               
-#' -----------------------------------------------------------------------------
-#' @param dataset rules defined in a csv file
-#' @param input.columns input columns of the dataframe
-#' @param output.columns required output columns
-#' -----------------------------------------------------------------------------
-#' @return drools session
-#' 
-rulesSessionDrl <- function(rules,input.columns, output.columns) {
-  rules <- paste(rules, collapse='\n')
-  input.columns <- paste(input.columns,collapse=',')
-  output.columns <- paste(output.columns,collapse=',')
-  droolsSession<-.jnew('org/math/r/drools/DroolsService',rules,input.columns, output.columns)
-  return(droolsSession)
-}
-
-
-#' -----------------------------------------------------------------------------
-#' @description: This function is used to execute all kinds of rules (defined in csv or drl or DT format)
-#'               
-#' -----------------------------------------------------------------------------
-#' @param rules.session output fo rulesSession function
-#' @param input.df input dataframe
-#' -----------------------------------------------------------------------------
-#' @return output dataframe
-#'
-
-runRulesDrl<-function(rules.session,input.df) {
-  conn<-textConnection('input.csv.string','w')
-  write.csv(input.df,file=conn)
-  close(conn)
-  input.csv.string <- paste(input.csv.string, collapse='\n')
-  output.csv.string <- .jcall(rules.session, 'S', 'execute',input.csv.string)
-  conn <- textConnection(output.csv.string, 'r')
-  output.df<-read.csv(file=conn, header=T)
-  close(conn)
-  return(output.df)
-}
