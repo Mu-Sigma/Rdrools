@@ -118,11 +118,11 @@ executeRulesOnDataset <- function(dataset,rules){
       outputDf %>% append(., list(runRules(rules.Session,inputData))) -> outputDf
     }
     
-    outputWithAllRows %>% append(., list(formatOutput(dataset = dataset,outputDf = outputDf[[ruleNum]],
+    outputWithAllRows %>% append(., list(formatOutput(dataset = dataset,outputDf = outputDf[[length(outputDf)]],
                                                       rules = rules, filteredDataFalse = filteredDataFalse,
                                                       input.columns=input.columns,ruleNum= ruleNum)$outputDf)) ->
       outputWithAllRows
-    outputDfForEachRule %>% append(., list(formatOutput(dataset = dataset, outputDf = outputDf[[ruleNum]],
+    outputDfForEachRule %>% append(., list(formatOutput(dataset = dataset, outputDf = outputDf[[length(outputDf)]],
                                                         rules = rules, filteredDataFalse = filteredDataFalse,
                                                         input.columns=input.columns,ruleNum = ruleNum)[[2]])) ->
       outputDfForEachRule
