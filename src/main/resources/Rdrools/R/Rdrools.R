@@ -148,8 +148,8 @@ executeRulesOnDataset <- function(dataset,rules){
           rules.Session <- rulesSession(unlist(drlRules),input.columns,output.columns)
           outputDf[[i]] <- runRules(rules.Session,inputData)  
         }else{#only filter
-        outputDf[[i]] <- filteredData
-        filteredDataFalse <- NULL}
+          outputDf[[i]] <- filteredData
+          filteredDataFalse <- NULL}
         
       }else if(aggregationFunc == "compare"){
         inputData <- filteredDataTrue
@@ -173,7 +173,7 @@ executeRulesOnDataset <- function(dataset,rules){
         drlRules <-  getDrlForRowwiseRules(dataset,rules,i,input.columns,output.columns)
       }
       rules.Session <- rulesSession(unlist(drlRules),input.columns,output.columns)
-      outputDf[[i]] <- unique(runRules(rules.Session,dataset)  )
+      outputDf[[i]] <- unique(runRules(rules.Session,dataset) )
       
       
       
@@ -184,7 +184,8 @@ executeRulesOnDataset <- function(dataset,rules){
     
   }
   
-  intermediateOutput <- list(rep(NULL, nrow(rules)))
+  intermediateOutput <- outputWithAllRows
+  #list(rep(NULL, nrow(rules)))
   
   output <- mapply(list,
                    input=csvFormatOfEachRule,
@@ -380,64 +381,70 @@ formatOutput <- function(dataset,outputDf,rules,filteredDataFalse,input.columns,
     #getting the last row for each group
     outputDfForEachRule <- eval(parse(text=paste('outputDf%>%group_by(',groupbyColumn,')%>%slice(c(n()))%>%ungroup()')))
     #adding new column, Indices
+    groupbyColumn <-unlist(strsplit(groupbyColumn,","))
+    outputDf<- outputDfForEachRule[,c(groupbyColumn,ruleName,ruleValue)]
     
     outputDfForEachRule$Indices <- 0
     for(j in 1:nrow(outputDfForEachRule)){
       lowerRange<-outputFormatted[2*j-1,"rowNumber"]
       upperRange <- outputFormatted[2*j,"rowNumber"]
       #setting all the rows of group as true/false according to the last row of each group
-      ifelse(outputFormatted[,ruleName][2*j,]=='true',outputDf[c(as.numeric(lowerRange):as.numeric(upperRange)), ruleName] <-"true",outputDf[c(as.numeric(lowerRange):as.numeric(upperRange)), ruleName]  <- "false")
+      # ifelse(outputFormatted[,ruleName][2*j,]=='true',outputDf[c(as.numeric(lowerRange):as.numeric(upperRange)), ruleName] <-"true",outputDf[c(as.numeric(lowerRange):as.numeric(upperRange)), ruleName]  <- "false")
       #getting the required columns from the output
-      outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
+      
+      
+      #outputDf <- outputDf[,c(groupbyColumn,ruleName,ruleValue,"rowNumber")]
       #adding the filtered out rows with flag False to the final output
-      outputDf <- rbind(outputDf,filteredDataFalse)
-      groupbyColumn <-unlist(strsplit(groupbyColumn,","))
-  
-      outputDfForEachRule$Group<- apply( outputDfForEachRule[ , groupbyColumn ] , 1 , paste , collapse = "-" )
-  
+      outputDfForEachRule$Group<- apply( outputDfForEachRule[ , groupbyColumn ] , 1 , paste , collapse = ":" )
+      
       #groupbyColumn <-unlist(strsplit(groupbyColumn,","))
       outputDfForEachRule <- outputDfForEachRule[,c("Group",ruleName,"Indices",groupbyColumn)]
       #getting the Indices of each group
       outputDfForEachRule[j,"Indices"]<-paste(seq(as.numeric(lowerRange),as.numeric(upperRange)),collapse = ",")
       outputDfForEachRule <- outputDfForEachRule[,c("Group","Indices",ruleName,groupbyColumn)]
     }   }else{
-    
-    if(aggregationFunc != "compare" && aggregationFunc != ""){
-      #agg on whole column  
-      #getting the last row
-      outputFormatted <- as_tibble(outputDf) %>% slice(n())
       
-      ifelse(outputFormatted[,ruleName][1,]=='true',outputDf[c(1:nrow(outputDf)), ruleName] <-"true",outputDf[c(1:nrow(outputDf)), ruleName]  <- "false")
-      #getting the required columns
-      outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
-      outputDf <- rbind(outputDf,filteredDataFalse)
-      outputDfForEachRule <- outputFormatted
-      outputDfForEachRule$Group <- 1
-      outputDfForEachRule$Indices <- paste(outputDf[,"rowNumber"],collapse = ",")
-      outputDfForEachRule <- outputDfForEachRule[,c("Group","Indices",ruleName)]
+      if(aggregationFunc != "compare" && aggregationFunc != ""){
+        #agg on whole column  
+        #getting the last row
+        outputFormatted <- outputDf%>%slice(n())
+        
+        ifelse(outputFormatted[,ruleName][1,]=='true',outputDf[c(1:nrow(outputDf)), ruleName] <-"true",outputDf[c(1:nrow(outputDf)), ruleName]  <- "false")
+        #getting the required columns
+        outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
+        outputDf <- rbind(outputDf,filteredDataFalse)
+        outputDfForEachRule <- outputFormatted
+        outputDfForEachRule$Group <- 1
+        outputDfForEachRule$Indices <- paste(outputDf[,"rowNumber"],collapse = ",")
+        outputDfForEachRule <- outputDfForEachRule[,c("Group","Indices",ruleName)]
+        outputDf <- list()
+      }else if(aggregationFunc=="compare"){
+        
+        outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
+        outputDf <- rbind(outputDf,filteredDataFalse)
+        
+        outputDfForEachRule <- outputDf
+        rowsFailedInComparision <- dataset[-(outputDf$rowNumber),]
+        ruleName <- paste0("Rule",ruleNum)
+        ruleValue <- paste0("Rule",ruleNum,"Value")
+        if(nrow(rowsFailedInComparision)!=0){
+          
+          rowsFailedInComparision[,ruleName] <-"false"
+          rowsFailedInComparision[,ruleValue] <-"NA"
+          outputDfForEachRule <- rbind(outputDfForEachRule,rowsFailedInComparision)
+        }
+        outputDfForEachRule$Group <-outputDfForEachRule$rowNumber
+        outputDfForEachRule$Indices <- outputDfForEachRule$rowNumber
+        outputDfForEachRule <- outputDfForEachRule[,c("Group","Indices",ruleName)]
+        outputDf <- list()
+      }else{
+        outputDfForEachRule <- outputDf
+        outputDfForEachRule$Group <-outputDfForEachRule$rowNumber
+        outputDfForEachRule$Indices <- outputDfForEachRule$rowNumber
+        outputDfForEachRule <- outputDfForEachRule[,c("Group","Indices",ruleName)]
+        outputDf <- list()
+      }
       
-    }else{
-      
-      outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
-      outputDf <- rbind(outputDf,filteredDataFalse)
-      
-      outputDfForEachRule <- outputDf
-      rowsFailedInComparision <- dataset[-(outputDf$rowNumber),]
-      ruleName <- paste0("Rule",ruleNum)
-      ruleValue <- paste0("Rule",ruleNum,"Value")
-      
-      rowsFailedInComparision[,ruleName] <-"false"
-      
-      rowsFailedInComparision[,ruleValue] <-"0"
-      #print(paste0(colnames(rowsFailedInComparision)),ruleNum)
-      
-      outputDfForEachRule <- rbind(outputDfForEachRule,rowsFailedInComparision)
-      outputDfForEachRule$Group <-outputDfForEachRule$rowNumber
-      outputDfForEachRule$Indices <- outputDfForEachRule$rowNumber
-      outputDfForEachRule <- outputDfForEachRule[,c("Group","Indices",ruleName)]
-      
-    }
-    
     }
   outputDfForEachRule <- outputDfForEachRule[,c("Group","Indices",ruleName)]
   outputDfForEachRule <- setNames(outputDfForEachRule, c("Group","Indices","IsTrue"))
@@ -476,7 +483,6 @@ getDrlForRowwiseRules <- function(dataset,rules,ruleNum,input.columns,output.col
   drlRules <- append(drlRules,outputCols)
   drlRules[length(drlRules)+1] <- paste0("output.put(\"Rule",ruleNum,"\"",", \"\"+","\"true\"",");")
   drlRules[length(drlRules)+1] <-'end'
-  print(drlRules)
   return(drlRules)  
   
 }
@@ -501,24 +507,6 @@ rulesSessionDrl <- function(rules,input.columns, output.columns) {
   return(droolsSession)
 }
 
-#' -----------------------------------------------------------------------------
-#' @description: This function is used to call the drools session for rules that are in decision table format
-#'               
-#' -----------------------------------------------------------------------------
-#' @param rulesDT rules defined in a decision table
-#' @param input.columns input columns of the dataframe
-#' @param output.columns required output columns
-#' -----------------------------------------------------------------------------
-#' @return drools session
-#' 
-rulesSessionDT<-function(rulesDT,input.columns,output.columns){
-  
-  
-  
-  
-  
-  
-}
 
 
 #' -----------------------------------------------------------------------------
