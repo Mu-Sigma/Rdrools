@@ -504,7 +504,9 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
     append(.,paste0("output.put('",ruleValue,"',",
                     shQuote(paste("Not",filterCond)),");"))%>%
     append(.,'end') -> drlRules
-  
+  print(drlRules)
+  print(input.columns)
+  prin
   filteredOutputSession <- rulesSessionDrl(drlRules, input.columns, 
                                            output.columns=output.columns)
   filteredOutput <- runRulesDrl(filteredOutputSession, dataset)
