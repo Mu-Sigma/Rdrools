@@ -5,7 +5,7 @@
 ################################################################################################################
 
 
-source(file = "../R/Rdrools_Refactoring.R")
+source(file = "../R/Rdrools.R")
 if(!require(testthat)){
   install.packages("testthat")
 }
@@ -13,9 +13,9 @@ if(!require(testthat)){
 
 library(testthat)
 
-sampleDataset <- read.csv("../data/SampleDataset/TransactionsData.csv")
+sampleDataset <- transactionData
 wrongRules <- read.csv("wrongRules.csv")
-sampleRules <- read.csv("../data/SampleRules/workingRules.csv")
+sampleRules <- transactionRules
 
 test <- function(){
   failedTests <-  list()
