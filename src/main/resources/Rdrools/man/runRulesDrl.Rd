@@ -4,16 +4,16 @@
 \alias{runRulesDrl}
 \title{Apply a set of rule transformations to a data frame}
 \usage{
-runRulesDrl(rulesSession, inputDf)
+runRulesDrl(rulesSession, input.df)
 }
 \arguments{
 \item{rulesSession}{a session of the rules engine created using the the
 \code{\link {rulesSessionDrl}}}
 
-\item{inputDf}{a data frame consisting of a set of rows you wish to transform, and columns you wish to use in the transformation}
+\item{input.df}{a data frame consisting of a set of rows you wish to transform, and columns you wish to use in the transformation}
 }
 \value{
-outputDf a data frame which is the result of transformations applied to the input data frame(\code{inputDf}), the columns being the list provided through the \code{outputColumns} parameter in 
+output.df a data frame which is the result of transformations applied to the input data frame(\code{input.df}), the columns being the list provided through the \code{output.columns} parameter in 
 \code{\link {rulesSessionDrl}}
 }
 \description{
@@ -27,10 +27,10 @@ If you are not familiar with the drools file format, please have a look at the r
 library(Rdrools)
 data(class)
 data(rules)
-inputColumns<-c('name', 'class', 'grade', 'email')
-outputColumns<-c('address', 'subject', 'body')
-rulesSession<-rulesSession(rules, inputColumns, outputColumns)
-outputDf<-runRules(rulesSession, class)
+input.columns<-c('name', 'class', 'grade', 'email')
+output.columns<-c('address', 'subject', 'body')
+rulesSession<-rulesSession(rules, input.columns, output.columns)
+output.df<-runRules(rulesSession, class)
 
 
 }

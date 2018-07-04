@@ -47,8 +47,8 @@
 #' 
 #' @examples
 #'   library(Rdrools)
-#'   data(transactionsData)
-#'   data(transactionsRules)
+#'   data(transactionData)
+#'   data(transactionRules)
 #'   executeRulesOnDataset(transactionsData, transactionsRules)
 #' @keyword rulesSessionDrl 
 #' @keyword runRulesDrl 
@@ -133,9 +133,9 @@ executeRulesOnDataset <- function(dataset, rules){
     if(filterCond != ""){
       #when there is filter
       filteredData <- getDrlForFilterRules(dataset, rules, ruleNum, outputCols,
-                                           inputColumns, outputColumns)
+                                           input.columns, output.columns)
       ruleName <- paste0("Rule", ruleNum)
-      filteredData <- filteredData[, c(inputColumns, ruleName, ruleValue)]
+      filteredData <- filteredData[, c(input.columns, ruleName, ruleValue)]
       filteredData %>% 
         filter_(., paste(ruleName,"==","'true'")) -> filteredDataTrue
       filteredData %>% 
@@ -145,9 +145,9 @@ executeRulesOnDataset <- function(dataset, rules){
         if(operation != ""){
           
           drlRules <- getDrlForRowwiseRules(dataset, rules, ruleNum, 
-                                            inputColumns, outputColumns)
-          rules.Session <- rulesSessionDrl(unlist(drlRules), inputColumns, 
-                                           outputColumns)
+                                            input.columns, output.columns)
+          rules.Session <- rulesSessionDrl(unlist(drlRules), input.columns, 
+                                           output.columns)
           outputDf %>% append(., list(filteredData)) -> outputDf
         }else{
           
@@ -157,13 +157,13 @@ executeRulesOnDataset <- function(dataset, rules){
       }else if(aggregationFunc == "compare"){
         drlRules <- ruleToCompareColumns(dataset = dataset, rules = rules, 
                                          ruleNum = ruleNum)
-        rules.Session <- rulesSessionDrl(unlist(drlRules), inputColumns, 
-                                         outputColumns)
+        rules.Session <- rulesSessionDrl(unlist(drlRules), input.columns, 
+                                         output.columns)
         outputDf %>% 
           append(., list(runRulesDrl(rules.Session, filteredDataTrue))) -> outputDf
       }else{
-        rules.Session <- rulesSessionDrl(unlist(drlRules), inputColumns,
-                                         outputColumns)
+        rules.Session <- rulesSessionDrl(unlist(drlRules), input.columns,
+                                         output.columns)
         outputDf %>% 
           append(., list(runRulesDrl(rules.Session, filteredDataTrue))) -> outputDf
       }
@@ -175,10 +175,10 @@ executeRulesOnDataset <- function(dataset, rules){
                                          ruleNum = ruleNum)
       }else if(aggregationFunc == ""){
         drlRules <-  getDrlForRowwiseRules(dataset, rules, ruleNum, 
-                                           inputColumns, outputColumns)
+                                           input.columns, output.columns)
       }
-      rules.Session <- rulesSessionDrl(unlist(drlRules), inputColumns,
-                                       outputColumns)
+      rules.Session <- rulesSessionDrl(unlist(drlRules), input.columns,
+                                       output.columns)
       outputDf %>% 
         append(., list(unique(runRulesDrl(rules.Session,dataset)))) -> outputDf
     }
@@ -187,14 +187,14 @@ executeRulesOnDataset <- function(dataset, rules){
                                   outputDf = outputDf[[length(outputDf)]],
                                   rules = rules,
                                   filteredDataFalse = filteredDataFalse,
-                                  inputColumns=inputColumns, 
+                                  input.columns=input.columns, 
                                   ruleNum= ruleNum)$outputDf)) -> outputWithAllRows
     outputDfForEachRule %>% 
       append(., list(formatOutput(dataset = dataset, 
                                   outputDf = outputDf[[length(outputDf)]],
                                   rules = rules, 
                                   filteredDataFalse = filteredDataFalse,
-                                  inputColumns=inputColumns,
+                                  input.columns=input.columns,
                                   ruleNum = ruleNum)[[2]])) -> outputDfForEachRule
     
     intermediateOutput <- outputWithAllRows
@@ -212,11 +212,11 @@ executeRulesOnDataset <- function(dataset, rules){
   # converting factors to character
   rules[] <- lapply(rules, as.character)
   # getting input and output columns
-  inputColumns <- getrequiredColumns(dataset,rules)[[1]]
-  outputColumns <- getrequiredColumns(dataset,rules)[[2]]
+  input.columns <- getrequiredColumns(dataset,rules)[[1]]
+  output.columns <- getrequiredColumns(dataset,rules)[[2]]
   # changing the column names of the dataset by removing . or _ present in the 
   # column names
-  colnames(dataset) <- inputColumns
+  colnames(dataset) <- input.columns
   # getting the required format to display output columns
   rulesList <- list()
   outputCols <- list()
@@ -249,16 +249,16 @@ executeRulesOnDataset <- function(dataset, rules){
 #'@alias rulesSessionDrl
 #'@title Creates a session of the rules engine
 #'@description The rulesSession creates a session that interfaces between R and the Drools engine. The session is utilized by the runRules function for executing a data frame against a set of rules
-#'@usage rulesSessionDrl(rules, inputColumns, outputColumns)
+#'@usage rulesSessionDrl(rules, input.columns, output.columns)
 #' 
 #'@param rules a character vector consisting of lines read from a rules file of format drl(drools rules file)\cr
 #'     This character vector is eventually collapsed into a character vector of length 1, so the way you read the file could potentially be just about anything
 #'   
-#'@param  inputColumns a character vector of a set of input column, for example\cr
-#'     \code{inputColumns<-c('name', 'class', 'grade', 'email')}
-#'@param outputColumns
+#'@param  input.columns a character vector of a set of input column, for example\cr
+#'     \code{input.columns<-c('name', 'class', 'grade', 'email')}
+#'@param output.columns
 #'     a character vector of a set of expected output columns, for example\cr
-#'     \code{outputColumns<-c('address', 'subject', 'body')}
+#'     \code{output.columns<-c('address', 'subject', 'body')}
 #'
 #'@details 
 #'   An active drools rules session. This promotes re-usability of a session, i.e. you can utilize the same session repetitively for different data sets of the same format.
@@ -277,22 +277,22 @@ executeRulesOnDataset <- function(dataset, rules){
 #' library(Rdrools)
 #' data(class)
 #' data(rules)
-#' inputColumns<-c('name', 'class', 'grade', 'email')
-#' outputColumns<-c('address', 'subject', 'body')
-#' rulesSession<-rulesSession(rules, inputColumns, outputColumns)
-#' outputDf<-runRules(rulesSession, class)
+#' input.columns<-c('name', 'class', 'grade', 'email')
+#' output.columns<-c('address', 'subject', 'body')
+#' rulesSession<-rulesSession(rules, input.columns, output.columns)
+#' output.df<-runRules(rulesSession, class)
 #' 
 #' 
 #'@keyword runRulesDrl 
 #'@keyword rulesSessionDrl 
 #'@keyword Rdrools 
 
-rulesSessionDrl <- function(rules, inputColumns, outputColumns) {
+rulesSessionDrl <- function(rules, input.columns, output.columns) {
   rules <- paste(rules, collapse='\n')
-  inputColumns <- paste(inputColumns,collapse=',')
-  outputColumns <- paste(outputColumns,collapse=',')
-  droolsSession <- .jnew('org/math/r/drools/DroolsService',rules, inputColumns,
-                       outputColumns)
+  input.columns <- paste(input.columns,collapse=',')
+  output.columns <- paste(output.columns,collapse=',')
+  droolsSession <- .jnew('org/math/r/drools/DroolsService',rules, input.columns,
+                         output.columns)
   return(droolsSession)
 }
 
@@ -303,16 +303,16 @@ rulesSessionDrl <- function(rules, inputColumns, outputColumns) {
 #' 
 #'@description This function is the core of the Rdrools package. Rules are applied on an input data frame and the results are returned as the output of the function. The columns on which the rules need to be applied have to be provided explicitly. Additionally, the new columns that would be created based on the rules have to be provided explicitly as well.\cr 
 #' The rules engine picks up a row from the data frame, applies the transformation to it based on rules provided and saves the result in an output data frame. 
-#'@usage runRulesDrl(rulesSession, inputDf)
+#'@usage runRulesDrl(rulesSession, input.df)
 #' 
 #'@param rulesSession a session of the rules engine created using the the
 #' \code{\link {rulesSessionDrl}}
 #'
-#'@param inputDf a data frame consisting of a set of rows you wish to transform, and columns you wish to use in the transformation
+#'@param input.df a data frame consisting of a set of rows you wish to transform, and columns you wish to use in the transformation
 #'
 #'@details If you are not familiar with the drools file format, please have a look at the references provided in the \code{\link {Rdrools man page}}. More details on how conflicting rules are resolved using either salience or the Reete algorithm are also present in the references.
 #' 
-#'@return outputDf a data frame which is the result of transformations applied to the input data frame(\code{inputDf}), the columns being the list provided through the \code{outputColumns} parameter in 
+#'@return output.df a data frame which is the result of transformations applied to the input data frame(\code{input.df}), the columns being the list provided through the \code{output.columns} parameter in 
 #'\code{\link {rulesSessionDrl}}
 #'
 #'@author
@@ -322,7 +322,7 @@ rulesSessionDrl <- function(rules, inputColumns, outputColumns) {
 #'@boldTransformation policy\cr
 #'Transformations are applied row by row, iteratively. That is to say, all inputs required for a rule transformation should be present in columns as a part of that row itself. Each row should be considered #'independent of another; all input values required for a transformation should be available in that row itself. The expectation from rules engines are often misplaced.\cr
 #'@boldColumn Mismatch \cr
-#'Please make sure that the list of output columns provided through the \code{outputColumns} parameter is exhaustive. Any additional column which is created through the rules transformation but is not present in the list would inhibit proper functioning. In most cases, an error should be thrown.
+#'Please make sure that the list of output columns provided through the \code{output.columns} parameter is exhaustive. Any additional column which is created through the rules transformation but is not present in the list would inhibit proper functioning. In most cases, an error should be thrown.
 #'
 #'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}' 
 #'
@@ -330,17 +330,17 @@ rulesSessionDrl <- function(rules, inputColumns, outputColumns) {
 #' library(Rdrools)
 #' data(class)
 #' data(rules)
-#' inputColumns<-c('name', 'class', 'grade', 'email')
-#' outputColumns<-c('address', 'subject', 'body')
-#' rulesSession<-rulesSession(rules, inputColumns, outputColumns)
-#' outputDf<-runRules(rulesSession, class)
+#' input.columns<-c('name', 'class', 'grade', 'email')
+#' output.columns<-c('address', 'subject', 'body')
+#' rulesSession<-rulesSession(rules, input.columns, output.columns)
+#' output.df<-runRules(rulesSession, class)
 #' 
 #' 
 #'@keyword runRulesDrl 
 #'@keyword rulesSessionDrl 
 #'@keyword Rdrools 
 
-runRulesDrl<-function(rulesSession,inputDf) {
+runRulesDrl<-function(rulesSession,input.df) {
   conn <- textConnection('input.csv.string','w')
   write.csv(input.df,file=conn)
   close(conn)
@@ -349,7 +349,7 @@ runRulesDrl<-function(rulesSession,inputDf) {
   conn <- textConnection(output.csv.string, 'r')
   output.df<-read.csv(file=conn, header=T)
   close(conn)
-  return(outputDf)
+  return(output.df)
 }
 
 
@@ -400,24 +400,24 @@ getConditionForMultiGroupBy <- function(groupByColumn, aggregationFunc,
 getrequiredColumns <- function(dataset,rules){
   # removing the . or _ in the column names of the dataset
   colnames(dataset) <- gsub('\\.|\\_', '', colnames(dataset))
-  inputColumns <- colnames(dataset)
-  outputColumns <-list()
+  input.columns <- colnames(dataset)
+  output.columns <-list()
   valueColumns <- list()
   noOfColumns <- ncol(dataset)
   # adding one column for each rule
-  outputColumns <- lapply(1:nrow(rules), function(rulesRowNumber){
-    outputColumns[noOfColumns+rulesRowNumber] <- paste0("Rule", rulesRowNumber)
+  output.columns <- lapply(1:nrow(rules), function(rulesRowNumber){
+    output.columns[noOfColumns+rulesRowNumber] <- paste0("Rule", rulesRowNumber)
     
   })
   # adding columns to store the result value for each rule
   valueColumns <- lapply(1:nrow(rules), function(rulesRowNumber){
     valueColumns[rulesRowNumber] <- paste0("Rule", rulesRowNumber, "Value")
   })
-  inputColumns %>% append(.,list(outputColumns)) %>% 
-    append(.,list(valueColumns)) -> outputColumns 
+  input.columns %>% append(.,list(output.columns)) %>% 
+    append(.,list(valueColumns)) -> output.columns 
   
-  return(list(inputColumns=inputColumns,
-              outputColumns=unlist(outputColumns)))
+  return(list(input.columns=input.columns,
+              output.columns=unlist(output.columns)))
 }
 
 #' -----------------------------------------------------------------------------
@@ -454,15 +454,15 @@ changecolnamesInRules <-function(dataset,rules){
 #' @param rules rules in csv format
 #' @param ruleNum the number of the current rule 
 #' @param outputCols the output statments to show the output
-#' @param inputColumns input columns which are obtained from getrequiredColumns
-#' @param outputColumns output columns which are obtained from 
+#' @param input.columns input columns which are obtained from getrequiredColumns
+#' @param output.columns output columns which are obtained from 
 #' getrequiredColumns
 #' -----------------------------------------------------------------------------
 #' @return filtered output with flags true/false
 #' 
 
 getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols, 
-                                 inputColumns, outputColumns){
+                                 input.columns, output.columns){
   # this function is used to create rules in drl for the rules which 
   # involve filters. this is done by creating the complementary rule for the 
   # given filter and then labelling the true/false
@@ -505,8 +505,8 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
                     shQuote(paste("Not",filterCond)),");"))%>%
     append(.,'end') -> drlRules
   
-  filteredOutputSession <- rulesSessionDrl(drlRules, inputColumns, 
-                                           outputColumns=outputColumns)
+  filteredOutputSession <- rulesSessionDrl(drlRules, input.columns, 
+                                           output.columns=output.columns)
   filteredOutput <- runRulesDrl(filteredOutputSession, dataset)
   
   return(filteredOutput)
@@ -569,7 +569,7 @@ ruleToCompareColumns <- function(dataset, rules, ruleNum){
 #' function
 #' @param rules the rules defined in csv format
 #' @param filteredDataFalse the fitlered data which is flagged as false
-#' @param inputColumns the input columns of the dataset which is obtained
+#' @param input.columns the input columns of the dataset which is obtained
 #' from getrequiredColumns function
 #' @param ruleNum the number of the rule currently being run
 #' -----------------------------------------------------------------------------
@@ -577,7 +577,7 @@ ruleToCompareColumns <- function(dataset, rules, ruleNum){
 #'
 
 formatOutput <- function(dataset, outputDf, rules, filteredDataFalse, 
-                         inputColumns, ruleNum){
+                         input.columns, ruleNum){
 # adding row number as a column to identify the last and first row for each group
   groupByColumn  <- rules[ruleNum,"GroupBy"]
   aggregationFunc <-noquote( rules[ruleNum,"Function"])
@@ -623,7 +623,7 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
                outputDf[c(1:nrow(outputDf)), ruleName] <-"true",
                outputDf[c(1:nrow(outputDf)), ruleName]  <- "false")
         # getting the required columns
-        outputDf <- outputDf[,c(inputColumns,ruleName,ruleValue)]
+        outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
         outputDf <- rbind(outputDf,filteredDataFalse)
         outputDfForEachRule <- outputFormatted
         outputDfForEachRule$Group <- 1
@@ -634,7 +634,7 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
         outputDf <- list()
       }else if(aggregationFunc=="compare"){
         
-        outputDf <- outputDf[,c(inputColumns,ruleName,ruleValue)]
+        outputDf <- outputDf[,c(input.columns,ruleName,ruleValue)]
         outputDf <- rbind(outputDf,filteredDataFalse)
         
         outputDfForEachRule <- outputDf
@@ -683,8 +683,8 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
 #' @return drl format of rules for row wise rules
 #' 
 
-getDrlForRowwiseRules <- function(dataset, rules, ruleNum, inputColumns, 
-                                  outputColumns){
+getDrlForRowwiseRules <- function(dataset, rules, ruleNum, input.columns, 
+                                  output.columns){
   
   aggregationColumn <- rules[ruleNum,"Column"]
   operation <-  rules[ruleNum,"Operation"]

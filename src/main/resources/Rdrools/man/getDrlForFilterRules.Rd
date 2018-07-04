@@ -4,8 +4,8 @@
 \alias{getDrlForFilterRules}
 \title{-----------------------------------------------------------------------------}
 \usage{
-getDrlForFilterRules(dataset, rules, ruleNum, outputCols, inputColumns,
-  outputColumns)
+getDrlForFilterRules(dataset, rules, ruleNum, outputCols, input.columns,
+  output.columns)
 }
 \arguments{
 \item{dataset}{data frame on which rules are to be run}
@@ -16,9 +16,9 @@ getDrlForFilterRules(dataset, rules, ruleNum, outputCols, inputColumns,
 
 \item{outputCols}{the output statments to show the output}
 
-\item{inputColumns}{input columns which are obtained from getrequiredColumns}
+\item{input.columns}{input columns which are obtained from getrequiredColumns}
 
-\item{outputColumns}{output columns which are obtained from 
+\item{output.columns}{output columns which are obtained from 
 getrequiredColumns
 -----------------------------------------------------------------------------}
 }

@@ -1,8 +1,0 @@
-Filters,GroupBy,Column,Function,Operation,Argument
-Species == 'setosa',,,,,
-,Species,Sepal.Length,average,>=,5.9
-,,Sepal.Length,average,<,5
-Sepal.Width > 3,,Sepal.Length,average,>=,5
-Petal.Width > 0.4,Species,Petal.Length,average,<,5
-,,Petal.Length,compare,>=,Sepal.Width
-Species == 'versicolor',,Petal.Length,compare,>=,Sepal.Width

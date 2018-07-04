@@ -11,7 +11,7 @@ vignette: >
 
 ```{r echo = FALSE, message = FALSE, results = 'hide', warning = FALSE, error=FALSE}
 #Package installation if required for handbook
-required.packages <- c('rJava','Rdrools','DT','lubridate','tidyverse','plotly')
+required.packages <- c('rJava','Rdrools', 'Rdroolsjars','DT','lubridate','tidyverse','plotly')
 
 for(pkg in required.packages){
   if(!require(pkg,character.only = T)){
@@ -58,8 +58,8 @@ For ease of use, the rules can be defined in a *csv* format, with a familiar str
 
 ```{r}
 data(iris)
-
-sampleRules <- read.csv("../data/SampleRules/irisRules.csv")
+data("irisRules")
+sampleRules <- irisRules
 rownames(sampleRules) <- seq(1:nrow(sampleRules))
 sampleRules[is.na(sampleRules)]    <-""
 sampleRules
@@ -177,7 +177,7 @@ To illustrate this case, we apply only rule 2 from the set of sample rules.
 ```{r,comment=NA}
 groupedAggregationRule <- sampleRules[2,]
 groupedAggregationRuleOutput <- executeRulesOnDataset(iris, groupedAggregationRule)
-#str(groupedAggregationRuleOutput)
+str(groupedAggregationRuleOutput)
 ```
 
 The output has three objects:

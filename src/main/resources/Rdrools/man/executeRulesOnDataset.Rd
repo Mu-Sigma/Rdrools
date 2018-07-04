@@ -33,11 +33,9 @@ The vignette provides further details on the format of the rules file
 }
 \examples{
   library(Rdrools)
-  data(transactionsData)
-  data(transactionsRules)
+  data(transactionData)
+  data(transactionRules)
   executeRulesOnDataset(transactionsData, transactionsRules)
-  
-
 }
 \seealso{
 \code{\link{runRulesDrl}}, \code{\link{Rdrools}}

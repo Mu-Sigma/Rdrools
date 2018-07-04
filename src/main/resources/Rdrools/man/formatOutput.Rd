@@ -4,7 +4,8 @@
 \alias{formatOutput}
 \title{-----------------------------------------------------------------------------}
 \usage{
-formatOutput(dataset, outputDf, rules, filteredDataFalse, inputColumns, ruleNum)
+formatOutput(dataset, outputDf, rules, filteredDataFalse, input.columns,
+  ruleNum)
 }
 \arguments{
 \item{dataset}{rules defined in a csv file}
@@ -16,7 +17,7 @@ function}
 
 \item{filteredDataFalse}{the fitlered data which is flagged as false}
 
-\item{inputColumns}{the input columns of the dataset which is obtained
+\item{input.columns}{the input columns of the dataset which is obtained
 from getrequiredColumns function}
 
 \item{ruleNum}{the number of the rule currently being run

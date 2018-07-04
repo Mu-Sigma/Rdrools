@@ -4,7 +4,7 @@
 \alias{getDrlForRowwiseRules}
 \title{-----------------------------------------------------------------------------}
 \usage{
-getDrlForRowwiseRules(dataset, rules, ruleNum, inputColumns, outputColumns)
+getDrlForRowwiseRules(dataset, rules, ruleNum, input.columns, output.columns)
 }
 \arguments{
 \item{dataset}{rules defined in a csv file}

@@ -4,17 +4,17 @@
 \alias{rulesSessionDrl}
 \title{Creates a session of the rules engine}
 \usage{
-rulesSessionDrl(rules, inputColumns, outputColumns)
+rulesSessionDrl(rules, input.columns, output.columns)
 }
 \arguments{
 \item{rules}{a character vector consisting of lines read from a rules file of format drl(drools rules file)\cr
 This character vector is eventually collapsed into a character vector of length 1, so the way you read the file could potentially be just about anything}
 
-\item{inputColumns}{a character vector of a set of input column, for example\cr
-\code{inputColumns<-c('name', 'class', 'grade', 'email')}}
+\item{input.columns}{a character vector of a set of input column, for example\cr
+\code{input.columns<-c('name', 'class', 'grade', 'email')}}
 
-\item{outputColumns}{a character vector of a set of expected output columns, for example\cr
-\code{outputColumns<-c('address', 'subject', 'body')}}
+\item{output.columns}{a character vector of a set of expected output columns, for example\cr
+\code{output.columns<-c('address', 'subject', 'body')}}
 
 \item{rules.session.object}{Returns a session to the rules engine}
 }
@@ -31,10 +31,10 @@ Please have a look at the examples provided in the 'examples' section of the \co
 library(Rdrools)
 data(class)
 data(rules)
-inputColumns<-c('name', 'class', 'grade', 'email')
-outputColumns<-c('address', 'subject', 'body')
-rulesSession<-rulesSession(rules, inputColumns, outputColumns)
-outputDf<-runRules(rulesSession, class)
+input.columns<-c('name', 'class', 'grade', 'email')
+output.columns<-c('address', 'subject', 'body')
+rulesSession<-rulesSession(rules, input.columns, output.columns)
+output.df<-runRules(rulesSession, class)
 
 
 }
