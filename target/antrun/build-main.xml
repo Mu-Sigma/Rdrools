@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <delete dir="/Users/naren/DIE/IntelligentReporting/Rdrools/build"/>
+  <mkdir dir="/Users/naren/DIE/IntelligentReporting/Rdrools/build"/>
+  <echo>copying the Rdrools folder.</echo>
+  <copy todir="/Users/naren/DIE/IntelligentReporting/Rdrools/build">
+    <fileset dir="/Users/naren/DIE/IntelligentReporting/Rdrools/src/main/resources"/>
+  </copy>
+</target>
+</project>
