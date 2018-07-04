@@ -35,7 +35,7 @@ options(stringsAsFactors = F)
 The Rdrools package aims to accomplish two main objectives:
 
 * Allow data scientists an intuitive interface to **execute business rules on datasets for the purpose of analysis or designing intelligent systems**, while leveraging the Drools rule engine
-* Provide a direct interface to *Drools* for executing all types of rules defined in *Drools* formats - *.drl* and *.dt*
+* Provide a direct interface to *Drools* for executing all types of rules defined in *Drools* *.drl* format 
 
 ## The advantages of a rule engine
 
@@ -164,7 +164,7 @@ plotgraphs <- function(result,plotName){
 
 ```{r}
 
-anomaliesCountGraph<-plotgraphs(result=filterRuleOutput, plotName="Plot of points distribution")
+anomaliesCountGraph <- plotgraphs(result=filterRuleOutput, plotName="Plot of points distribution")
 anomaliesCountGraph[[1]][[1]]
 ```
 
