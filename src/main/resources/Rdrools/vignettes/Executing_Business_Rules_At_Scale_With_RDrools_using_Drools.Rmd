@@ -1,7 +1,7 @@
 ---
 title: "Executing business rules at scale using RDrools - an interface to Drools"
 author: "Naren Srinivasan, Dheekshitha PS"
-date: "6/19/2018"
+date: "7/4/2018"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Executing business rules at scale using RDrools - an interface to Drools}
@@ -53,8 +53,6 @@ In order to achieve the objective of providing data scientists an intuitive inte
 * *filter*
 * *group by*
 * *aggregate*
-
-Additionally, defined rules can be executed as a sequence, with the result of one rule feeding into another
 
 For ease of use, the rules can be defined in a *csv* format, with a familiar structure using the verbs discussed earlier. We take the example of the iris dataset and define rules on it. The sample rules for the iris dataset are defined in the *irisRules.csv*
 
@@ -179,7 +177,7 @@ To illustrate this case, we apply only rule 2 from the set of sample rules.
 ```{r,comment=NA}
 groupedAggregationRule <- sampleRules[2,]
 groupedAggregationRuleOutput <- executeRulesOnDataset(iris, groupedAggregationRule)
-str(groupedAggregationRuleOutput)
+#str(groupedAggregationRuleOutput)
 ```
 
 The output has three objects:

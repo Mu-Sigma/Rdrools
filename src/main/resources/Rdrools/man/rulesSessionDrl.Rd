@@ -8,20 +8,20 @@ Creates a session of the rules engine
 The rulesSession creates a session that interfaces between R and the Drools engine. The session is utilized by the runRules function for executing a data frame against a set of rules.
 }
 \usage{
-rulesSessionDrl(rules, input.columns, output.columns)
+rulesSessionDrl(rules, inputColumns, outputColumns)
 }
 \arguments{
  \item{rules}{
      a character vector consisting of lines read from a rules file of format drl(drools rules file)\cr
      This character vector is eventually collapsed into a character vector of length 1, so the way you read the file could potentially be just about anything
 }
-  \item{input.columns}{
+  \item{inputColumns}{
      a character vector of a set of input column, for example\cr
-     \code{input.columns<-c('name', 'class', 'grade', 'email')} 
+     \code{inputColumns<-c('name', 'class', 'grade', 'email')} 
 }
-  \item{output.columns}{
+  \item{outputColumns}{
 	a character vector of a set of expected output columns, for example\cr
-	\code{output.columns<-c('address', 'subject', 'body')}
+	\code{outputColumns<-c('address', 'subject', 'body')}
 }
 }
 \details{
@@ -43,9 +43,9 @@ Please have a look at the examples provided in the 'examples' section of the \co
 \examples{
 library(Rdrools)
 data(rules)
-input.columns<-c('name', 'class', 'grade', 'email')
-output.columns<-c('address', 'subject', 'body')
-rules.session<-rulesSession(rules, input.columns, output.columns)
+inputColumns<-c('name', 'class', 'grade', 'email')
+outputColumns<-c('address', 'subject', 'body')
+rulesSession<-rulesSession(rules, inputColumns, outputColumns)
 }
 \keyword{ rulesSessionDrl }
 \keyword{ runRulesDrl }

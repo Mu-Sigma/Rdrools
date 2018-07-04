@@ -16,45 +16,43 @@ executeRulesOnDataset(dataset, rules)
   a dataframe consisting of a set of rows you wish to transform, and columns you wish to use in the transformation
 }
   \item{rules}{
-    
+    rules given in a csv file
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+For further details about the rules file, look at the vignette
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
+  a list of input, intermediate output and output per rule
+ input: a tibble containing the rule defined by the user
+ intermediate output: is an empty tibble when there is no groupby and a tibble 
+                      with the aggregated value for each groupw when there
+                      is a groupby
+ output: a tibble with 3 columns:
+ 
+   Group: represents group name when there is a groupby and the row number when 
+        there is no groupby
+   Indices: the row numbers in each group when there is a groupby and row 
+           numbers of the dataframe when there is no groupby
+   IsTrue: flag to say if the data point is satisfying the rule or not.
+          Gives true if the point or group satisfies the rule and false if not.  
+
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\author{
+Dheekshitha PS <dheekshitha119@gmail.com>
+}
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\code{\link{runRulesDrl}}, \code{\link{Rdrools}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+library(Rdrools)
+data(transactionsData)
+data(transactionsRules)
+executeRulesOnDataset(transactionsData, transactionsRules)
 
-## The function is currently defined as
-function (x) 
-{
-  }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ rulesSessionDrl }
+\keyword{ runRulesDrl }
+\keyword{ Rdrools }
