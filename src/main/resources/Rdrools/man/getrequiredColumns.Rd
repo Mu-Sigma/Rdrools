@@ -7,7 +7,7 @@
 getrequiredColumns(dataset, rules)
 }
 \arguments{
-\item{dataset}{the dataframe on which rules are to be run}
+\item{dataset}{the data frame on which rules are to be run}
 
 \item{rules}{rules defined in a csv file
 -----------------------------------------------------------------------------}

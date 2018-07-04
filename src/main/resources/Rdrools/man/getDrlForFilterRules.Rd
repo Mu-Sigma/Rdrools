@@ -8,7 +8,7 @@ getDrlForFilterRules(dataset, rules, ruleNum, outputCols, inputColumns,
   outputColumns)
 }
 \arguments{
-\item{dataset}{dataframe on which rules are to be run}
+\item{dataset}{data frame on which rules are to be run}
 
 \item{rules}{rules in csv format}
 

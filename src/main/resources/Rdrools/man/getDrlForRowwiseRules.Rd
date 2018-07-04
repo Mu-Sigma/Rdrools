@@ -12,7 +12,7 @@ getDrlForRowwiseRules(dataset, rules, ruleNum, inputColumns, outputColumns)
 \item{rules}{the rules defined in csv format
 -----------------------------------------------------------------------------}
 
-\item{outputDf}{the output dataframe returned by the executeRulesOnDataset 
+\item{outputDf}{the output data frame returned by the executeRulesOnDataset 
 function}
 }
 \value{

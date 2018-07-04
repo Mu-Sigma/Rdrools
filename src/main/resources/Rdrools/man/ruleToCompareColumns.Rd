@@ -7,7 +7,7 @@
 ruleToCompareColumns(dataset, rules, ruleNum)
 }
 \arguments{
-\item{dataset}{dataframe on which rules are to be run}
+\item{dataset}{data frame on which rules are to be run}
 
 \item{rules}{the rules defined in csv format}
 

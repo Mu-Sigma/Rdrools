@@ -19,65 +19,40 @@
   .jpackage(pkgname, lib.loc = libname)
 }
 
-#' \name{executeRulesOnDataset}
-#' \alias{executeRulesOnDataset}
+#'@name executeRulesOnDataset
+#'@alias executeRulesOnDataset
+#'@title Run a set of rules on a dataset
+#'@description The \emph{executeRulesOnDataset} function is an intuitive interface to execute rules on datasets, which is explicitly designed for data scientists. As input to this function rules are defined using the typical language of data science with verbs such as filter, group by and aggregate. Rules can be specified in a .csv file, loaded into the R session and passed to this function
+#'@usage executeRulesOnDataset(dataset, rules)
+#'@param dataset a data frame on which the defined set of rules should be applied
+#'@param rules a data frame in which rules are defined
+#'@details The vignette provides further details on the format of the rules file
+#'@return  A list of input, intermediate output and output per rule
+#'   \enumerate{
+#'   \item \strong{input}: a tibble containing the rules defined by the user
+#'   \item \strong{intermediateOutput}: is an empty tibble when there is no group by condition specified, and a tibble 
+#'   with the aggregated value for each group when it is
+#'   \item \strong{output}: a tibble with 3 columns:
+#'     \enumerate{
+#'     \item \strong{Group}: represents group name when there is a group by condition specified and the row number in the case that there is no group by condition
+#'     \item \strong{Indices}: the row numbers corresponding to each group when there is a group by specified and row numbers of the data frame in the case that there is no group by condition
+#'     \item \strong{IsTrue}: flag indicating if the data point/ set of data points satisfies the rule or not. Returns TRUE if the point or group satisfies the rule and FALSE if not.  
+#'     }
+#'    }
+#' @author Dheekshitha PS < Dheekshitha.PS@mu-sigma.com>
+#' @author Naren Srinivasan <Naren.Srinivasan@mu-sigma.com>
+#' @author Mayukh Bose <Mayukh.Bose@mu-sigma.com>
 #' 
-#' \title{
-#'   Runs the data science specific rules
-#' }
-#' \description{
-#'   This function is specifically for running data science specific rules. Rules are applied on an input data frame and the results are returned as the output of the function. The rules are to be defined in a csv file. The rules engine runs the rules on the inputted dataset and stores the results in a list.
-#' }
-#' \usage{
-#'   executeRulesOnDataset(dataset, rules)
-#' }
+#' @seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
 #' 
-#' \arguments{
-#'   \item{dataset}{
-#'     a dataframe consisting of a set of rows you wish to transform, and columns you wish to use in the transformation
-#'   }
-#'   \item{rules}{
-#'     rules given in a csv file
-#'   }
-#' }
-#' \details{
-#'   For further details about the rules file, look at the vignette
-#' }
-#' \value{
-#'   a list of input, intermediate output and output per rule
-#'   input: a tibble containing the rule defined by the user
-#'   intermediate output: is an empty tibble when there is no groupby and a tibble 
-#'   with the aggregated value for each groupw when there
-#'   is a groupby
-#'   output: a tibble with 3 columns:
-#'     
-#'     Group: represents group name when there is a groupby and the row number when 
-#'   there is no groupby
-#'   Indices: the row numbers in each group when there is a groupby and row 
-#'   numbers of the dataframe when there is no groupby
-#'   IsTrue: flag to say if the data point is satisfying the rule or not.
-#'   Gives true if the point or group satisfies the rule and false if not.  
-#'   
-#' }
-#' 
-#' \author{
-#'   Dheekshitha PS <dheekshitha119@gmail.com>
-#' }
-#' 
-#' \seealso{
-#'   \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
-#' }
-#' \examples{
+#' @examples
 #'   library(Rdrools)
 #'   data(transactionsData)
 #'   data(transactionsRules)
 #'   executeRulesOnDataset(transactionsData, transactionsRules)
-#'   
-#' }
-#' \keyword{ rulesSessionDrl }
-#' \keyword{ runRulesDrl }
-#' \keyword{ Rdrools }
-
+#' @keyword rulesSessionDrl 
+#' @keyword runRulesDrl 
+#' @keyword Rdrools 
 executeRulesOnDataset <- function(dataset, rules){
   if(nrow(dataset) == 0){
     stop("Dataset cannot be empty")
@@ -231,7 +206,7 @@ executeRulesOnDataset <- function(dataset, rules){
     return(resultTibble)
   }
   
-  # adding row numbers to the dataframe
+  # adding row numbers to the data frame
   dataset$rowNumber <- 1:nrow(dataset)
   rules <-changecolnamesInRules(dataset = dataset, rules = rules )
   # converting factors to character
@@ -270,58 +245,47 @@ executeRulesOnDataset <- function(dataset, rules){
   return(output)
 }
 
-#' @name  {rulesSessionDrl}
-#' @alias {rulesSessionDrl}
+#'@name  rulesSessionDrl
+#'@alias rulesSessionDrl
+#'@title Creates a session of the rules engine
+#'@description The rulesSession creates a session that interfaces between R and the Drools engine. The session is utilized by the runRules function for executing a data frame against a set of rules
+#'@usage rulesSessionDrl(rules, inputColumns, outputColumns)
 #' 
-#' @title{
-#'   Creates a session of the rules engine
-#' }
-#' @description{
-#'   The rulesSession creates a session that interfaces between R and the Drools engine. The session is utilized by the runRules function for executing a data frame against a set of rules.
-#' }
-#' @usage{
-#'   rulesSessionDrl(rules, inputColumns, outputColumns)
-#' }
-#' @arguments {
-#'   @item {rules}{
-#'     a character vector consisting of lines read from a rules file of format drl(drools rules file)\cr
+#'@param rules a character vector consisting of lines read from a rules file of format drl(drools rules file)\cr
 #'     This character vector is eventually collapsed into a character vector of length 1, so the way you read the file could potentially be just about anything
-#'   }
-#'   @item {inputColumns}{
-#'     a character vector of a set of input column, for example\cr
-#'     \code {inputColumns<-c('name', 'class', 'grade', 'email')} 
-#'   }
-#'   @item {outputColumns}{
+#'   
+#'@param  inputColumns a character vector of a set of input column, for example\cr
+#'     \code{inputColumns<-c('name', 'class', 'grade', 'email')}
+#'@param outputColumns
 #'     a character vector of a set of expected output columns, for example\cr
 #'     \code{outputColumns<-c('address', 'subject', 'body')}
-#'   }
-#' }
-#' @details {
+#'
+#'@details 
 #'   An active drools rules session. This promotes re-usability of a session, i.e. you can utilize the same session repetitively for different data sets of the same format.
-#' }
-#' @value {
-#'   @item {rules.session.object}{Returns a session to the rules engine}
-#' }
-#' @author {
-#'   Ashwin Raaghav <ashraaghav@gmail.com>, SMS Chauhan <smschauhah@gmail.com>
-#' }
-#' @note {
-#'   Please have a look at the examples provided in the 'examples' section of the \code{\link{Rdrools}} man page. A sample data set and a set of rules have been supplied help you understand the package usage.
-#' }
 #' 
-#' \seealso {
-#'   \code {\link {runRulesDrl}}, \code {\link {Rdrools}}
-#' }
-#' \@examples{
-#'   library(Rdrools)
-#'   data(rules)
-#'   inputColumns<-c('name', 'class', 'grade', 'email')
-#'   outputColumns<-c('address', 'subject', 'body')
-#'   rules.session<-rulesSession(rules, inputColumns, outputColumns)
-#' }
-#' \@keyword { rulesSessionDrl }
-#' \@keyword { runRulesDrl }
-#' \@keyword { Rdrools } 
+#'@return 
+#'@param  rules.session.object Returns a session to the rules engine
+#'@author 
+#'   Ashwin Raaghav <ashraaghav@gmail.com>, SMS Chauhan <smschauhah@gmail.com>
+#' 
+#'@note 
+#'   Please have a look at the examples provided in the 'examples' section of the \code{\link {Rdrools}} man page. A sample data set and a set of rules have been supplied help you understand the package usage.
+#' 
+#' 
+#'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}' 
+#'@examples
+#' library(Rdrools)
+#' data(class)
+#' data(rules)
+#' inputColumns<-c('name', 'class', 'grade', 'email')
+#' outputColumns<-c('address', 'subject', 'body')
+#' rulesSession<-rulesSession(rules, inputColumns, outputColumns)
+#' outputDf<-runRules(rulesSession, class)
+#' 
+#' 
+#'@keyword runRulesDrl 
+#'@keyword rulesSessionDrl 
+#'@keyword Rdrools 
 
 rulesSessionDrl <- function(rules, inputColumns, outputColumns) {
   rules <- paste(rules, collapse='\n')
@@ -333,49 +297,36 @@ rulesSessionDrl <- function(rules, inputColumns, outputColumns) {
 }
 
 
-#'\name{runRulesDrl}
-#'\alias{runRulesDrl}
-#'\title{
-#' Apply a set of rule transformations to a data frame
-#' }
-#'\description{
-#' This function is the core of the Rdrools package. Rules are applied on an input data frame and the results are returned as the output of the function. The columns on which the rules need to be applied #'have to be provided explicitly. Additionally, the new columns that would be created based on the rules have to be provided explicitly as well.\cr 
-#' The rules engine picks up a row from the dataframe, applies the transformation to it based on rules provided and saves the result in an output dataframe. 
-#' }
-
-#'\usage{
-#' runRulesDrl(rulesSession, inputDf)
-#' }
-#'\arguments{
-#'\item{rulesSession}{
-#'a session of the rules engine created using the the \code{\link{rulesSessionDrl}}
-#'}
-#'\item{inputDf}{
-#' a dataframe consisting of a set of rows you wish to transform, and columns you wish to use in the transformation
-#' }
-
-#'}
-#'\details{
-#'If you are not familiar with the drools file format, please have a look at the references provided in the \code{\link{Rdrools}} man page. More details on how conflicting rules are resolved using either salience or the Reete algorithm are also present in the references.
-#'}
-#'\value{
-#'\item{outputDf }{a dataframe which is the result of transformations applied to the input dataframe(\code{inputDf}), the columns being the list provided through the \code{outputColumns} parameter in #'\code{\link{rulesSessionDrl}}.}
-#'}
-
-#'\author{
+#'@name runRulesDrl
+#'@aliasrunRulesDrl
+#'@title Apply a set of rule transformations to a data frame
+#' 
+#'@description This function is the core of the Rdrools package. Rules are applied on an input data frame and the results are returned as the output of the function. The columns on which the rules need to be applied have to be provided explicitly. Additionally, the new columns that would be created based on the rules have to be provided explicitly as well.\cr 
+#' The rules engine picks up a row from the data frame, applies the transformation to it based on rules provided and saves the result in an output data frame. 
+#'@usage runRulesDrl(rulesSession, inputDf)
+#' 
+#'@param rulesSession a session of the rules engine created using the the
+#' \code{\link {rulesSessionDrl}}
+#'
+#'@param inputDf a data frame consisting of a set of rows you wish to transform, and columns you wish to use in the transformation
+#'
+#'@details If you are not familiar with the drools file format, please have a look at the references provided in the \code{\link {Rdrools man page}}. More details on how conflicting rules are resolved using either salience or the Reete algorithm are also present in the references.
+#' 
+#'@return outputDf a data frame which is the result of transformations applied to the input data frame(\code{inputDf}), the columns being the list provided through the \code{outputColumns} parameter in 
+#'\code{\link {rulesSessionDrl}}
+#'
+#'@author
 #' Ashwin Raaghav <ashraaghav@gmail.com>, SMS Chauhan <smschauhah@gmail.com>
-#' }
-#'\section{Warning}{
-#'\bold{Transformation policy}\cr
+#' 
+#'@sectionWarning
+#'@boldTransformation policy\cr
 #'Transformations are applied row by row, iteratively. That is to say, all inputs required for a rule transformation should be present in columns as a part of that row itself. Each row should be considered #'independent of another; all input values required for a transformation should be available in that row itself. The expectation from rules engines are often misplaced.\cr
-#'\bold{Column Mismatch} \cr
+#'@boldColumn Mismatch \cr
 #'Please make sure that the list of output columns provided through the \code{outputColumns} parameter is exhaustive. Any additional column which is created through the rules transformation but is not present in the list would inhibit proper functioning. In most cases, an error should be thrown.
-#'}
-
-#'\seealso{
-#'\code{\link{Rdrools}}, \code{\link{rulesSessionDrl}} 
-#'}
-#'\examples{
+#'
+#'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}' 
+#'
+#'@examples
 #' library(Rdrools)
 #' data(class)
 #' data(rules)
@@ -384,10 +335,11 @@ rulesSessionDrl <- function(rules, inputColumns, outputColumns) {
 #' rulesSession<-rulesSession(rules, inputColumns, outputColumns)
 #' outputDf<-runRules(rulesSession, class)
 #' 
-#' }
-#'\keyword{ runRulesDrl }
-#'\keyword{ rulesSessionDrl }
-#'\keyword{ Rdrools }
+#' 
+#'@keyword runRulesDrl 
+#'@keyword rulesSessionDrl 
+#'@keyword Rdrools 
+
 runRulesDrl<-function(rulesSession,inputDf) {
   conn <- textConnection('input.csv.string','w')
   write.csv(input.df,file=conn)
@@ -440,7 +392,7 @@ getConditionForMultiGroupBy <- function(groupByColumn, aggregationFunc,
 #' @description: This function is used to get the required input and output 
 #' columns
 #' -----------------------------------------------------------------------------
-#' @param dataset the dataframe on which rules are to be run
+#' @param dataset the data frame on which rules are to be run
 #' @param rules rules defined in a csv file
 #' -----------------------------------------------------------------------------
 #' @return required input columns and output columns
@@ -472,7 +424,7 @@ getrequiredColumns <- function(dataset,rules){
 #' @description: This function is used to remove the . or _ in column names of
 #'  the dataset present in the rules file
 #' -----------------------------------------------------------------------------
-#' @param dataset the dataframe on which rules are to be run
+#' @param dataset the data frame on which rules are to be run
 #' @param rules rules defined in a csv file 
 #' -----------------------------------------------------------------------------
 #' @return rules in required format
@@ -498,7 +450,7 @@ changecolnamesInRules <-function(dataset,rules){
 #' @description: This function is used to get the drl format for the rules 
 #' which have filters
 #' -----------------------------------------------------------------------------
-#' @param dataset dataframe on which rules are to be run
+#' @param dataset data frame on which rules are to be run
 #' @param rules rules in csv format
 #' @param ruleNum the number of the current rule 
 #' @param outputCols the output statments to show the output
@@ -564,7 +516,7 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
 #' @description: This function is used to get drl rule for rules involving
 #'  comparing columns
 #' -----------------------------------------------------------------------------
-#' @param dataset dataframe on which rules are to be run
+#' @param dataset data frame on which rules are to be run
 #' @param rules the rules defined in csv format
 #' @param ruleNum number of the rule which has condition to compare columns
 #' -----------------------------------------------------------------------------
@@ -613,7 +565,7 @@ ruleToCompareColumns <- function(dataset, rules, ruleNum){
 #' involving groupby
 #' -----------------------------------------------------------------------------
 #' @param dataset rules defined in a csv file
-#' @param outputDf the output dataframe returned by the executeRulesOnDataset 
+#' @param outputDf the output data frame returned by the executeRulesOnDataset 
 #' function
 #' @param rules the rules defined in csv format
 #' @param filteredDataFalse the fitlered data which is flagged as false
@@ -724,7 +676,7 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
 #' wise rules
 #' -----------------------------------------------------------------------------
 #' @param dataset rules defined in a csv file
-#' @param outputDf the output dataframe returned by the executeRulesOnDataset 
+#' @param outputDf the output data frame returned by the executeRulesOnDataset 
 #' function
 #' @param rules the rules defined in csv format
 #' -----------------------------------------------------------------------------

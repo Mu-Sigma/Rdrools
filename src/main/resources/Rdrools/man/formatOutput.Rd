@@ -9,7 +9,7 @@ formatOutput(dataset, outputDf, rules, filteredDataFalse, inputColumns, ruleNum)
 \arguments{
 \item{dataset}{rules defined in a csv file}
 
-\item{outputDf}{the output dataframe returned by the executeRulesOnDataset 
+\item{outputDf}{the output data frame returned by the executeRulesOnDataset 
 function}
 
 \item{rules}{the rules defined in csv format}
