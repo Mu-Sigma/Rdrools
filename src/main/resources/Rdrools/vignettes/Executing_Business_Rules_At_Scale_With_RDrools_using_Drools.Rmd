@@ -23,13 +23,8 @@ for(pkg in required.packages){
 ```
 
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE)
-#library(Rdrools)
-#library(purrr)
 source("../R/Rdrools.R")
-#source("../R/Rdrools_refac.R")
 source("../../Rdroolsjars/R/onLoad.R")
-#source("../R/utils.R")
 options(stringsAsFactors = F)
 ```
 
@@ -117,7 +112,7 @@ plotgraphs <- function(result,plotName){
         anomaliesCountPlot[[i]] <- plot_ly(noOfTrueFalse, x=~IsTrue, y=~Frequency,
                                            type = "bar", width=800, height=500,marker = list(color = 'rgba(158,202,225, 1)',
                                                                                              line = list(color = 'rgba(8,48,107, 0)'))) %>%
-          layout(title = paste0("Distribution of points for rule "),
+          layout(title = paste0("Distribution of points for the rule "),
                  xaxis = list(title = ""),
                  yaxis = list(title = "Count"), margin = list(b = 80,t=50))
       }else{
