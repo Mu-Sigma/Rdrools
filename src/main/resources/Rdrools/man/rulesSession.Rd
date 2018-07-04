@@ -1,5 +1,5 @@
-\name{rulesSession}
-\alias{rulesSession}
+\name{rulesSessionDrl}
+\alias{rulesSessionDrl}
 
 \title{
 Creates a session of the rules engine
@@ -8,7 +8,7 @@ Creates a session of the rules engine
 The rulesSession creates a session that interfaces between R and the Drools engine. The session is utilized by the runRules function for executing a data frame against a set of rules.
 }
 \usage{
-rulesSession(rules, input.columns, output.columns)
+rulesSessionDrl(rules, input.columns, output.columns)
 }
 \arguments{
  \item{rules}{
@@ -38,7 +38,7 @@ Please have a look at the examples provided in the 'examples' section of the \co
 }
 
 \seealso{
-\code{\link{runRules}}, \code{\link{Rdrools}}
+\code{\link{runRulesDrl}}, \code{\link{Rdrools}}
 }
 \examples{
 library(Rdrools)
@@ -47,6 +47,6 @@ input.columns<-c('name', 'class', 'grade', 'email')
 output.columns<-c('address', 'subject', 'body')
 rules.session<-rulesSession(rules, input.columns, output.columns)
 }
-\keyword{ rulesSession }
-\keyword{ runRules }
+\keyword{ rulesSessionDrl }
+\keyword{ runRulesDrl }
 \keyword{ Rdrools }

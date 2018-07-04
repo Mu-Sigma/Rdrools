@@ -1,5 +1,5 @@
-\name{runRules}
-\alias{runRules}
+\name{runRulesDrl}
+\alias{runRulesDrl}
 \title{
 Apply a set of rule transformations to a data frame
 }
@@ -9,11 +9,11 @@ The rules engine picks up a row from the dataframe, applies the transformation t
 }
 
 \usage{
-runRules(rules.session, input.df)
+runRulesDrl(rules.session, input.df)
 }
 \arguments{
   \item{rules.session}{
-  a session of the rules engine created using the the \code{\link{rulesSession}}
+  a session of the rules engine created using the the \code{\link{rulesSessionDrl}}
 }
   \item{input.df}{
      a dataframe consisting of a set of rows you wish to transform, and columns you wish to use in the transformation
@@ -24,7 +24,7 @@ runRules(rules.session, input.df)
 If you are not familiar with the drools file format, please have a look at the references provided in the \code{\link{Rdrools}} man page. More details on how conflicting rules are resolved using either salience or the Reete algorithm are also present in the references.
 }
 \value{
-  \item{output.df }{a dataframe which is the result of transformations applied to the input dataframe(\code{input.df}), the columns being the list provided through the \code{output.columns} parameter in \code{\link{rulesSession}}.}
+  \item{output.df }{a dataframe which is the result of transformations applied to the input dataframe(\code{input.df}), the columns being the list provided through the \code{output.columns} parameter in \code{\link{rulesSessionDrl}}.}
 }
 
 \author{
