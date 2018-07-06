@@ -1,3 +1,0 @@
-Filters,GroupBy,Function,opertion,Argument,Column
-Credit_Card_Monthly_Expenditure > 28000,,,,,
-,"Account_ID,Month",Transaction_Amount,sum,>=,10000
