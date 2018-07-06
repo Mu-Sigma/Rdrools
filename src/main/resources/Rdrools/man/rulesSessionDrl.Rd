@@ -22,7 +22,7 @@ rules.session.object Returns a session to the rules engine
 }
 \description{
 The rulesSession creates a session that interfaces between R and the Drools engine. 
-The session is utilized by the runRules function for executing a data frame against a set of rules
+The session is utilized by the runRulesDrl function for executing a data frame against a set of rules
 }
 \details{
 An active drools rules session. This promotes re-usability of a session, i.e. you can 
@@ -30,7 +30,7 @@ utilize the same session repetitively for different data sets of the same format
 }
 \note{
 Please have a look at the examples provided in the 'examples' section of the 
-\code{\link{Rdrools}} man page. A sample data set and a set of rules have been supplied help you 
+\code{\link{Rdrools}}. A sample data set and a set of rules have been supplied help you 
 understand the package usage.
 }
 \examples{
@@ -43,10 +43,12 @@ rulesSession<-rulesSessionDrl(rules, input.columns, output.columns)
 output.df<-runRulesDrl(rulesSession, class)
 }
 \seealso{
-\code{\link{runRulesDrl}}, \code{\link{Rdrools}}'
+\code{\link{runRulesDrl}}, \code{\link{Rdrools}}
 }
 \author{
-Ashwin Raaghav <ashraaghav@gmail.com>, SMS Chauhan <smschauhah@gmail.com>
+Ashwin Raaghav <ashwin.raaghav@mu-sigma.com>
+
+SMS Chauhan <sms.chauhan@mu-sigma.com>
 }
 \keyword{rulesSessionDrl}
 \keyword{runRulesDrl}

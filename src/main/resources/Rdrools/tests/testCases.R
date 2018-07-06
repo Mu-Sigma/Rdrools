@@ -13,7 +13,7 @@ if(!require(testthat)){
 library(testthat)
 
 sampleDataset <- data("transactionData")
-wrongRules <- data("wrongRules")
+wrongRules <- load(file = "wrongRules.rda")
 sampleRules <- data("transactionRules")
 
 test <- function(){

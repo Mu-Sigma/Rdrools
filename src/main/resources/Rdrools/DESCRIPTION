@@ -1,7 +1,7 @@
 Package: Rdrools
 Type: Package
 Version: 1.1.0
-Date: 2018-07-04
+Date: 2018-07-07
 Title: A Rules Engine Based on 'Drools'
 Authors@R: c(person("Dheekshitha","PS", email = "Dheekshitha.PS@mu-sigma.com", role = c("aut")),
     person("Naren","Srinivasan", email = "Naren.Srinivasan@mu-sigma.com", role = c("cre","aut")),

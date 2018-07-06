@@ -7,7 +7,7 @@
 runRulesDrl(rulesSession, input.df)
 }
 \arguments{
-\item{rulesSession}{a session of the rules engine created using the \code{\link{rulesSessionDrl}} function}
+\item{rules.session}{a session of the rules engine created using the \code{\link{rulesSessionDrl}} function}
 
 \item{input.df}{a data frame consisting of a set of rows you wish to transform, and columns you 
 wish to use in the transformation}
@@ -26,8 +26,18 @@ the rules have to be provided explicitly as well. The rules engine picks up a ro
 }
 \details{
 If you are not familiar with the Drools file format, please have a look at the references 
-provided in the \code{\link{Rdrools man page}}. More details on how conflicting rules are resolved 
+provided in the \code{\link{Rdrools}}. More details on how conflicting rules are resolved 
 using either salience or the Reete algorithm are also present in the references.
+
+\strong{Transformation policy} Transformations are applied row by row, iteratively. That is to say, 
+all inputs required for a rule transformation should be present in columns as a part of that row 
+itself. Each row should be considered #'independent of another; all input values required for a
+transformation should be available in that row itself. The expectation from rules engines are 
+often misplaced.
+\strong{Column Mismatch} Please make sure that the list of output columns provided through the 
+\code{output.columns} parameter is exhaustive. Any additional column which is created through the 
+rules transformation but is not present in the list would inhibit proper functioning. In most cases,
+an error should be thrown.
 }
 \examples{
 library(Rdrools)
@@ -35,24 +45,16 @@ data(class)
 data(rules)
 input.columns<-c('name', 'class', 'grade', 'email')
 output.columns<-c('address', 'subject', 'body')
-rulesSession<-rulesSession(rules, input.columns, output.columns)
-output.df<-runRules(rulesSession, class)
+rulesSession<-rulesSessionDrl(rules, input.columns, output.columns)
+output.df<-runRulesDrl(rulesSession, class)
 }
 \seealso{
-\code{\link{runRulesDrl}}, \code{\link{Rdrools}}'
+\code{\link{runRulesDrl}}, \code{\link{Rdrools}}
 }
 \author{
-Ashwin Raaghav <ashraaghav@gmail.com>, SMS Chauhan <smschauhan@gmail.com>
-\strong{Transformation policy} Transformations are applied row by row, iteratively. That is to say, 
-all inputs required for a rule transformation should be present in columns as a part of that row 
-itself. Each row should be considered #'independent of another; all input values required for a
-transformation should be available in that row itself. The expectation from rules engines are 
-often misplaced.\cr
-\strong{Column Mismatch} Please make sure that the list of output columns provided through the 
-\code{output.columns} parameter is exhaustive. Any additional column which is created through the 
-rules transformation but is not present in the list would inhibit proper functioning. In most cases,
-an error should be thrown.
+Ashwin Raaghav <ashwin.raaghav@mu-sigma.com>
+
+SMS Chauhan <sms.chauhan@mu-sigma.com>
 }
-\keyword{Rdrools}
 \keyword{rulesSessionDrl}
 \keyword{runRulesDrl}

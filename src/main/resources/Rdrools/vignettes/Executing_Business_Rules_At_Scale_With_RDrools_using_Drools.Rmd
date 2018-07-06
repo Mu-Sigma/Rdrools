@@ -5,7 +5,7 @@ date: "7/4/2018"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Executing business rules at scale using RDrools - an interface to Drools}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   \usepackage[utf8]{inputenc}
 ---
 

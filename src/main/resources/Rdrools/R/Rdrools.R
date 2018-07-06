@@ -47,7 +47,7 @@
 #' @author Naren Srinivasan <Naren.Srinivasan@mu-sigma.com>
 #' @author Mayukh Bose <Mayukh.Bose@mu-sigma.com>
 #' 
-#' @seealso \code{\link{runRulesDrl}}
+#' @seealso \code{\link{runRulesDrl}},\code{\link{Rdrools}}
 #' 
 #' @examples
 #'   library(Rdrools)
@@ -70,6 +70,14 @@ executeRulesOnDataset <- function(dataset, rules){
   }
   
   rules[is.na(rules)] <- ""
+  
+  #'@name getRuleInDrl
+  #'@aliases getRuleInDrl
+  #'@title Transform a rule into DRL format
+  #'@description This function transforms a rule into the DRL format accepted by the Drools engine
+  #'@param row a row from the data frame of rules provided as a list
+  #'@return  A string with the rule in DRL format
+  #'@keywords internal
   getRuleInDrl <- function(rowList){
     ruleNum <- rowList$ruleNum
     filterCond <- rowList$Filters
@@ -252,11 +260,7 @@ executeRulesOnDataset <- function(dataset, rules){
 #'@aliases rulesSessionDrl
 #'@title Creates a session of the rules engine
 #'@description The rulesSession creates a session that interfaces between R and the Drools engine. 
-<<<<<<< HEAD
-  #'The session is utilized by the runRules function for executing a data frame against a set of rules
-=======
-  #'The session is utilized by the runRulesDrl function for executing a data frame against a set of rules
->>>>>>> 64ab0974d8f72a46990afd3c9e51ea75d4b33cd4
+#'The session is utilized by the runRulesDrl function for executing a data frame against a set of rules
 #'@usage rulesSessionDrl(rules, input.columns, output.columns)
 #'@param rules a character vector consisting of lines read from a rules file of format \emph{.drl}
 #'(Drools rules file). This character vector is eventually collapsed into a character vector of length 1, 
@@ -268,20 +272,12 @@ executeRulesOnDataset <- function(dataset, rules){
 #'@details An active drools rules session. This promotes re-usability of a session, i.e. you can 
 #'utilize the same session repetitively for different data sets of the same format.
 #'@return rules.session.object Returns a session to the rules engine
-<<<<<<< HEAD
-#'@author Ashwin Raaghav <ashraaghav@gmail.com>, SMS Chauhan <smschauhah@gmail.com>
-#'@note Please have a look at the examples provided in the 'examples' section of the 
-#'\code{\link{Rdrools}} man page. A sample data set and a set of rules have been supplied help you 
-#'understand the package usage.
-#'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}' 
-=======
 #'@note Please have a look at the examples provided in the 'examples' section of the 
 #'\code{\link{Rdrools}}. A sample data set and a set of rules have been supplied help you 
 #'understand the package usage.
 #'@author Ashwin Raaghav <ashwin.raaghav@mu-sigma.com>
 #'@author SMS Chauhan <sms.chauhan@mu-sigma.com>
 #'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
->>>>>>> 64ab0974d8f72a46990afd3c9e51ea75d4b33cd4
 #'@examples
 #' library(Rdrools)
 #' data(class)
@@ -312,24 +308,16 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #' the rules have to be provided explicitly as well. The rules engine picks up a row from the data frame,
 #'  applies the transformation to it based on rules provided and saves the result in an output data frame. 
 #'@usage runRulesDrl(rulesSession, input.df)
-#'@param rulesSession a session of the rules engine created using the \code{\link{rulesSessionDrl}} function
+#'@param rules.session a session of the rules engine created using the \code{\link{rulesSessionDrl}} function
 #'@param input.df a data frame consisting of a set of rows you wish to transform, and columns you 
 #'wish to use in the transformation
 #'@details If you are not familiar with the Drools file format, please have a look at the references 
-<<<<<<< HEAD
-#'provided in the \code{\link{Rdrools man page}}. More details on how conflicting rules are resolved 
-=======
 #'provided in the \code{\link{Rdrools}}. More details on how conflicting rules are resolved 
->>>>>>> 64ab0974d8f72a46990afd3c9e51ea75d4b33cd4
 #'using either salience or the Reete algorithm are also present in the references.
 #'@return output.df a data frame which is the result of transformations applied to the input data 
 #'frame(\code{input.df}), the columns being the list provided through the \code{output.columns} 
 #'parameter in \code{\link{rulesSessionDrl}}
-<<<<<<< HEAD
-#'@author Ashwin Raaghav <ashraaghav@gmail.com>, SMS Chauhan <smschauhan@gmail.com>
-=======
 #'@details
->>>>>>> 64ab0974d8f72a46990afd3c9e51ea75d4b33cd4
 #'\strong{Transformation policy} Transformations are applied row by row, iteratively. That is to say, 
 #'all inputs required for a rule transformation should be present in columns as a part of that row 
 #'itself. Each row should be considered #'independent of another; all input values required for a
@@ -339,26 +327,17 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #'\code{output.columns} parameter is exhaustive. Any additional column which is created through the 
 #'rules transformation but is not present in the list would inhibit proper functioning. In most cases,
 #' an error should be thrown.
-<<<<<<< HEAD
-#'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}' 
-=======
 #'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}} 
 #'@author Ashwin Raaghav <ashwin.raaghav@mu-sigma.com>
 #'@author SMS Chauhan <sms.chauhan@mu-sigma.com>
->>>>>>> 64ab0974d8f72a46990afd3c9e51ea75d4b33cd4
 #'@examples
 #' library(Rdrools)
 #' data(class)
 #' data(rules)
 #' input.columns<-c('name', 'class', 'grade', 'email')
 #' output.columns<-c('address', 'subject', 'body')
-<<<<<<< HEAD
-#' rulesSession<-rulesSession(rules, input.columns, output.columns)
-#' output.df<-runRules(rulesSession, class)
-=======
 #' rulesSession<-rulesSessionDrl(rules, input.columns, output.columns)
 #' output.df<-runRulesDrl(rulesSession, class)
->>>>>>> 64ab0974d8f72a46990afd3c9e51ea75d4b33cd4
 #'@keywords runRulesDrl 
 #'@keywords rulesSessionDrl 
 
@@ -418,7 +397,7 @@ getConditionForMultiGroupBy <- function(groupByColumn, aggregationFunc,
 #' @param rules rules defined in a csv file
 #' -----------------------------------------------------------------------------
 #' @return required input columns and output columns
-#' 
+#' @keywords internal
 getrequiredColumns <- function(dataset,rules){
   # removing the . or _ in the column names of the dataset
   colnames(dataset) <- gsub('\\.|\\_', '', colnames(dataset))
@@ -450,7 +429,7 @@ getrequiredColumns <- function(dataset,rules){
 #' @param rules rules defined in a csv file 
 #' -----------------------------------------------------------------------------
 #' @return rules in required format
-#' 
+#' @keywords internal
 
 changecolnamesInRules <-function(dataset,rules){
   
@@ -481,8 +460,7 @@ changecolnamesInRules <-function(dataset,rules){
 #' getrequiredColumns
 #' -----------------------------------------------------------------------------
 #' @return filtered output with flags true/false
-#' 
-
+#' @keywords internal
 getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols, 
                                  input.columns, output.columns){
   # this function is used to create rules in drl for the rules which 
@@ -526,12 +504,7 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
     append(.,paste0("output.put('",ruleValue,"',",
                     shQuote(paste("Not",filterCond)),");"))%>%
     append(.,'end') -> drlRules
-<<<<<<< HEAD
-  print(drlRules)
-  print(input.columns)
-  prin
-=======
->>>>>>> 64ab0974d8f72a46990afd3c9e51ea75d4b33cd4
+
   filteredOutputSession <- rulesSessionDrl(drlRules, input.columns, 
                                            output.columns=output.columns)
   filteredOutput <- runRulesDrl(filteredOutputSession, dataset)
@@ -548,7 +521,7 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
 #' @param ruleNum number of the rule which has condition to compare columns
 #' -----------------------------------------------------------------------------
 #' @return output in required format
-#'
+#' @keywords internal
 
 ruleToCompareColumns <- function(dataset, rules, ruleNum){
   
@@ -601,7 +574,7 @@ ruleToCompareColumns <- function(dataset, rules, ruleNum){
 #' @param ruleNum the number of the rule currently being run
 #' -----------------------------------------------------------------------------
 #' @return output in required format
-#'
+#' @keywords internal
 
 formatOutput <- function(dataset, outputDf, rules, filteredDataFalse, 
                          input.columns, ruleNum){
@@ -708,7 +681,7 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
 #' @param rules the rules defined in csv format
 #' -----------------------------------------------------------------------------
 #' @return drl format of rules for row wise rules
-#' 
+#' @keywords internal
 
 getDrlForRowwiseRules <- function(dataset, rules, ruleNum, input.columns, 
                                   output.columns){
@@ -736,7 +709,6 @@ getDrlForRowwiseRules <- function(dataset, rules, ruleNum, input.columns,
                              "\"",", \"\"+","\"true\"",");"))%>%
     append(.,'end')->drlRules
   return(drlRules)  
-  
 }
 
 
