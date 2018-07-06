@@ -23,8 +23,6 @@ for(pkg in required.packages){
 ```
 
 ```{r setup, include=FALSE}
-source("../R/Rdrools.R")
-source("../../Rdroolsjars/R/onLoad.R")
 options(stringsAsFactors = F)
 ```
 

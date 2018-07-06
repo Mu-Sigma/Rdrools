@@ -51,9 +51,9 @@
 #' 
 #' @examples
 #'   library(Rdrools)
-#'   data(transactionData)
-#'   data(transactionRules)
-#'   executeRulesOnDataset(transactionData, transactionRules)
+#'   data("iris")
+#'   data("irisRules")
+#'   executeRulesOnDataset(iris, irisRules)
 #' @keywords rulesSessionDrl 
 #' @keywords runRulesDrl 
 executeRulesOnDataset <- function(dataset, rules){
