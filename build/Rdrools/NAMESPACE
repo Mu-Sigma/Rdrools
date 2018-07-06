@@ -1,7 +1,0 @@
-import('rJava')
-import('Rdroolsjars')
-import('tidyverse')
-importFrom('utils', 'read.csv', 'write.csv')
-export('rulesSessionDrl')
-export('runRulesDrl')
-export('executeRulesOnDataset')

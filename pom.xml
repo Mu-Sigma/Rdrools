@@ -61,7 +61,7 @@
 			
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
+				<version>1.8</version>
 				<executions>
 					<execution>
 						<id>ant-cleanup-old-build</id>
@@ -119,7 +119,7 @@
 								<echo>Installing the Rdrools package....</echo>
 								<exec dir="${basedir}/build" executable="/bin/sh">
 									<arg value="-c" />
-									<arg value="R CMD INSTALL Rdrools_1.0.2.tar.gz" />
+									<arg value="R CMD INSTALL Rdrools_1.1.0.tar.gz" />
 								</exec>
 							</tasks>
 						</configuration>

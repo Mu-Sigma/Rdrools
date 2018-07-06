@@ -5,3 +5,7 @@
 .DS_Store
 #.profile#
 .gitignore
+target/*
+build/*
+.classpath
+.settings/org.eclipse.jdt.core.prefs
