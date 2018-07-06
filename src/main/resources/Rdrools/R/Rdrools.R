@@ -90,7 +90,7 @@ executeRulesOnDataset <- function(dataset, rules){
              groupByColumn == ""){
       # checking if there is no group by
       ruleCondition <-  paste0("result: Double()
-                                       from accumulate($condition:HashMap(),",
+                               from accumulate($condition:HashMap(),",
                                aggregationFunc, 
                                "(Double.valueOf($condition.get("
                                , shQuote(aggregationColumn),").toString())))")
@@ -100,7 +100,7 @@ executeRulesOnDataset <- function(dataset, rules){
       groupbyCondition <- paste0(groupByColumn, ' == input.get("',
                                  groupByColumn, '")')
       ruleCondition <-    paste0("result: Double()
-                                       from accumulate($condition:HashMap(", 
+                                 from accumulate($condition:HashMap(", 
                                  groupbyCondition,"),",
                                  aggregationFunc,"(Double.valueOf($condition.get(",
                                  shQuote(aggregationColumn),").toString())))")
@@ -252,7 +252,7 @@ executeRulesOnDataset <- function(dataset, rules){
 #'@aliases rulesSessionDrl
 #'@title Creates a session of the rules engine
 #'@description The rulesSession creates a session that interfaces between R and the Drools engine. 
-#'The session is utilized by the runRules function for executing a data frame against a set of rules
+  #'The session is utilized by the runRules function for executing a data frame against a set of rules
 #'@usage rulesSessionDrl(rules, input.columns, output.columns)
 #'@param rules a character vector consisting of lines read from a rules file of format \emph{.drl}
 #'(Drools rules file). This character vector is eventually collapsed into a character vector of length 1, 
@@ -313,7 +313,7 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #'all inputs required for a rule transformation should be present in columns as a part of that row 
 #'itself. Each row should be considered #'independent of another; all input values required for a
 #' transformation should be available in that row itself. The expectation from rules engines are 
-#' often misplaced.\cr
+#' often misplaced.
 #'\strong{Column Mismatch} Please make sure that the list of output columns provided through the 
 #'\code{output.columns} parameter is exhaustive. Any additional column which is created through the 
 #'rules transformation but is not present in the list would inhibit proper functioning. In most cases,
@@ -329,9 +329,8 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #' output.df<-runRules(rulesSession, class)
 #'@keywords runRulesDrl 
 #'@keywords rulesSessionDrl 
-#'@keywords Rdrools 
 
-runRulesDrl<-function(rulesSession,input.df) {
+runRulesDrl<-function(rules.session,input.df) {
   conn <- textConnection('input.csv.string','w')
   write.csv(input.df,file=conn)
   close(conn)
@@ -367,7 +366,7 @@ getConditionForMultiGroupBy <- function(groupByColumn, aggregationFunc,
     groupByCondition <- paste0(groupByColumn,'==input.get("',groupByColumn,'")')
     groupByCondition <-paste0(groupByCondition,collapse = ",")
     ruleCondition <-    paste0("result: Double()
-                                     from accumulate($condition:HashMap(",
+                               from accumulate($condition:HashMap(",
                                groupByCondition,"),",
                                aggregationFunc,
                                "(Double.valueOf($condition.get(",
@@ -495,7 +494,9 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
     append(.,paste0("output.put('",ruleValue,"',",
                     shQuote(paste("Not",filterCond)),");"))%>%
     append(.,'end') -> drlRules
-  
+  print(drlRules)
+  print(input.columns)
+  prin
   filteredOutputSession <- rulesSessionDrl(drlRules, input.columns, 
                                            output.columns=output.columns)
   filteredOutput <- runRulesDrl(filteredOutputSession, dataset)
@@ -569,7 +570,7 @@ ruleToCompareColumns <- function(dataset, rules, ruleNum){
 
 formatOutput <- function(dataset, outputDf, rules, filteredDataFalse, 
                          input.columns, ruleNum){
-# adding row number as a column to identify the last and first row for each group
+  # adding row number as a column to identify the last and first row for each group
   groupByColumn  <- rules[ruleNum,"GroupBy"]
   aggregationFunc <-noquote( rules[ruleNum,"Function"])
   ruleName <- paste0("Rule",ruleNum)
@@ -592,9 +593,9 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
     for(j in 1:nrow(outputDfForEachRule)){
       lowerRange<-outputFormatted[(2*j)-1,"rowNumber"]
       upperRange <- outputFormatted[(2*j),"rowNumber"]
-    # setting all the rows of group as true/false according to the 
-    # last row of each group
-    # adding the filtered out rows with flag False to the final output
+      # setting all the rows of group as true/false according to the 
+      # last row of each group
+      # adding the filtered out rows with flag False to the final output
       outputDfForEachRule$Group<- apply( outputDfForEachRule[ , groupByColumn ] ,
                                          1 , paste , collapse = ":" )
       outputDfForEachRule <- outputDfForEachRule[, c("Group",ruleName,"Indices",
