@@ -376,7 +376,7 @@ The following dataset provides transaction data for multiple customers of the re
   + *Total transactions*: number of transactions done by the customer in each month and the cumulative number of transactions
 
 ```{r,warning=FALSE}
-transactionData <- read.csv("../data/SampleDataset/TransactionsData.csv",stringsAsFactors = F)
+data(transactionData)
 transactionData$Date <- ymd(transactionData$Date)
 transactionData <- transactionData[1:500,]
 ```
@@ -414,7 +414,7 @@ In our case we check rules like:
 
 
 ```{r,comment=NA}
-transactionRules <- read.csv("../data/SampleRules/workingRules.csv")
+data(transactionRules)
 rownames(transactionRules) <- seq(1:nrow(transactionRules))
 transactionRules[is.na(transactionRules)]    <-""
 transactionRules

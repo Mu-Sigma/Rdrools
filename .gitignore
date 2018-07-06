@@ -4,5 +4,5 @@
 .Ruserdata
 .DS_Store
 #.profile#
-target/
-build/
+target/*
+build/*

@@ -252,7 +252,7 @@ executeRulesOnDataset <- function(dataset, rules){
 #'@aliases rulesSessionDrl
 #'@title Creates a session of the rules engine
 #'@description The rulesSession creates a session that interfaces between R and the Drools engine. 
-  #'The session is utilized by the runRules function for executing a data frame against a set of rules
+  #'The session is utilized by the runRulesDrl function for executing a data frame against a set of rules
 #'@usage rulesSessionDrl(rules, input.columns, output.columns)
 #'@param rules a character vector consisting of lines read from a rules file of format \emph{.drl}
 #'(Drools rules file). This character vector is eventually collapsed into a character vector of length 1, 
@@ -264,11 +264,12 @@ executeRulesOnDataset <- function(dataset, rules){
 #'@details An active drools rules session. This promotes re-usability of a session, i.e. you can 
 #'utilize the same session repetitively for different data sets of the same format.
 #'@return rules.session.object Returns a session to the rules engine
-#'@author Ashwin Raaghav <ashraaghav@gmail.com>, SMS Chauhan <smschauhah@gmail.com>
 #'@note Please have a look at the examples provided in the 'examples' section of the 
-#'\code{\link{Rdrools}} man page. A sample data set and a set of rules have been supplied help you 
+#'\code{\link{Rdrools}}. A sample data set and a set of rules have been supplied help you 
 #'understand the package usage.
-#'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}' 
+#'@author Ashwin Raaghav <ashwin.raaghav@mu-sigma.com>
+#'@author SMS Chauhan <sms.chauhan@mu-sigma.com>
+#'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
 #'@examples
 #' library(Rdrools)
 #' data(class)
@@ -303,12 +304,12 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #'@param input.df a data frame consisting of a set of rows you wish to transform, and columns you 
 #'wish to use in the transformation
 #'@details If you are not familiar with the Drools file format, please have a look at the references 
-#'provided in the \code{\link{Rdrools man page}}. More details on how conflicting rules are resolved 
+#'provided in the \code{\link{Rdrools}}. More details on how conflicting rules are resolved 
 #'using either salience or the Reete algorithm are also present in the references.
 #'@return output.df a data frame which is the result of transformations applied to the input data 
 #'frame(\code{input.df}), the columns being the list provided through the \code{output.columns} 
 #'parameter in \code{\link{rulesSessionDrl}}
-#'@author Ashwin Raaghav <ashraaghav@gmail.com>, SMS Chauhan <smschauhan@gmail.com>
+#'@details
 #'\strong{Transformation policy} Transformations are applied row by row, iteratively. That is to say, 
 #'all inputs required for a rule transformation should be present in columns as a part of that row 
 #'itself. Each row should be considered #'independent of another; all input values required for a
@@ -318,15 +319,17 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #'\code{output.columns} parameter is exhaustive. Any additional column which is created through the 
 #'rules transformation but is not present in the list would inhibit proper functioning. In most cases,
 #' an error should be thrown.
-#'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}' 
+#'@seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}} 
+#'@author Ashwin Raaghav <ashwin.raaghav@mu-sigma.com>
+#'@author SMS Chauhan <sms.chauhan@mu-sigma.com>
 #'@examples
 #' library(Rdrools)
 #' data(class)
 #' data(rules)
 #' input.columns<-c('name', 'class', 'grade', 'email')
 #' output.columns<-c('address', 'subject', 'body')
-#' rulesSession<-rulesSession(rules, input.columns, output.columns)
-#' output.df<-runRules(rulesSession, class)
+#' rulesSession<-rulesSessionDrl(rules, input.columns, output.columns)
+#' output.df<-runRulesDrl(rulesSession, class)
 #'@keywords runRulesDrl 
 #'@keywords rulesSessionDrl 
 
@@ -494,9 +497,6 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
     append(.,paste0("output.put('",ruleValue,"',",
                     shQuote(paste("Not",filterCond)),");"))%>%
     append(.,'end') -> drlRules
-  print(drlRules)
-  print(input.columns)
-  prin
   filteredOutputSession <- rulesSessionDrl(drlRules, input.columns, 
                                            output.columns=output.columns)
   filteredOutput <- runRulesDrl(filteredOutputSession, dataset)
