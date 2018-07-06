@@ -4,7 +4,7 @@
 \alias{runRulesDrl}
 \title{Apply a set of rule transformations to a data frame}
 \usage{
-runRulesDrl(rulesSession, input.df)
+runRulesDrl(rules.session, input.df)
 }
 \arguments{
 \item{rules.session}{a session of the rules engine created using the \code{\link{rulesSessionDrl}} function}

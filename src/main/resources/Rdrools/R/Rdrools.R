@@ -307,7 +307,7 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #'applied have to be provided explicitly. Additionally, the new columns that would be created based on
 #' the rules have to be provided explicitly as well. The rules engine picks up a row from the data frame,
 #'  applies the transformation to it based on rules provided and saves the result in an output data frame. 
-#'@usage runRulesDrl(rulesSession, input.df)
+#'@usage runRulesDrl(rules.session, input.df)
 #'@param rules.session a session of the rules engine created using the \code{\link{rulesSessionDrl}} function
 #'@param input.df a data frame consisting of a set of rows you wish to transform, and columns you 
 #'wish to use in the transformation

@@ -27,6 +27,7 @@
 #'   \item{Function}{Function to be applied on the specific variable in a rule}
 #'   \item{Operation}{The comparison operation to be performed to check the rule}
 #'   \item{Argument}{The value agains which the comparison operation is to be performed}
+#'   \item{caseSensitive}{Whether column name is case sensitive}
 #'   }
 "transactionRules"
 
