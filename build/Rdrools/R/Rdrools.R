@@ -248,7 +248,7 @@ executeRulesOnDataset <- function(dataset, rules){
 #'@name  rulesSessionDrl
 #'@alias rulesSessionDrl
 #'@title Creates a session of the rules engine
-#'@description The rulesSession creates a session that interfaces between R and the Drools engine. The session is utilized by the runRules function for executing a data frame against a set of rules
+#'@description The rulesSessionDrl creates a session that interfaces between R and the Drools engine. The session is utilized by the rulesRulesDrl function for executing a data frame against a set of rules
 #'@usage rulesSessionDrl(rules, input.columns, output.columns)
 #' 
 #'@param rules a character vector consisting of lines read from a rules file of format drl(drools rules file)\cr
@@ -279,8 +279,8 @@ executeRulesOnDataset <- function(dataset, rules){
 #' data(rules)
 #' input.columns<-c('name', 'class', 'grade', 'email')
 #' output.columns<-c('address', 'subject', 'body')
-#' rulesSession<-rulesSession(rules, input.columns, output.columns)
-#' output.df<-runRules(rulesSession, class)
+#' rules.session<-rulesSessionDrl(rules, input.columns, output.columns)
+#' output.df<-rulesRulesDrl(rules.session, class)
 #' 
 #' 
 #'@keyword runRulesDrl 
@@ -303,9 +303,9 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #' 
 #'@description This function is the core of the Rdrools package. Rules are applied on an input data frame and the results are returned as the output of the function. The columns on which the rules need to be applied have to be provided explicitly. Additionally, the new columns that would be created based on the rules have to be provided explicitly as well.\cr 
 #' The rules engine picks up a row from the data frame, applies the transformation to it based on rules provided and saves the result in an output data frame. 
-#'@usage runRulesDrl(rulesSession, input.df)
+#'@usage runRulesDrl(rules.session, input.df)
 #' 
-#'@param rulesSession a session of the rules engine created using the the
+#'@param rules.session a session of the rules engine created using the the
 #' \code{\link {rulesSessionDrl}}
 #'
 #'@param input.df a data frame consisting of a set of rows you wish to transform, and columns you wish to use in the transformation
@@ -332,15 +332,15 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #' data(rules)
 #' input.columns<-c('name', 'class', 'grade', 'email')
 #' output.columns<-c('address', 'subject', 'body')
-#' rulesSession<-rulesSession(rules, input.columns, output.columns)
-#' output.df<-runRules(rulesSession, class)
+#' rules.session<-rulesSessionDrl(rules, input.columns, output.columns)
+#' output.df<-runRulesDrl(rules.session, class)
 #' 
 #' 
 #'@keyword runRulesDrl 
 #'@keyword rulesSessionDrl 
 #'@keyword Rdrools 
 
-runRulesDrl<-function(rulesSession,input.df) {
+runRulesDrl<-function(rules.session,input.df) {
   conn <- textConnection('input.csv.string','w')
   write.csv(input.df,file=conn)
   close(conn)
@@ -504,7 +504,9 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
     append(.,paste0("output.put('",ruleValue,"',",
                     shQuote(paste("Not",filterCond)),");"))%>%
     append(.,'end') -> drlRules
-  
+  print(drlRules)
+  print(input.columns)
+  prin
   filteredOutputSession <- rulesSessionDrl(drlRules, input.columns, 
                                            output.columns=output.columns)
   filteredOutput <- runRulesDrl(filteredOutputSession, dataset)

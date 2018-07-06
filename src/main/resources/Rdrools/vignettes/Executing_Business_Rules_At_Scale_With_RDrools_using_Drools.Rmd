@@ -63,6 +63,7 @@ sampleRules <- irisRules
 rownames(sampleRules) <- seq(1:nrow(sampleRules))
 sampleRules[is.na(sampleRules)]    <-""
 sampleRules
+getwd()
 ```
 
 Through this function, various typical types of rules can be executed with a combination of the **verbs** described above.
