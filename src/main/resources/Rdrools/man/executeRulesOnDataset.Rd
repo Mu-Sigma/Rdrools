@@ -15,18 +15,22 @@ executeRulesOnDataset(dataset, rules)
 A list of input, intermediate output and output per rule
   \enumerate{
   \item \strong{input}: a tibble containing the rules defined by the user
-  \item \strong{intermediateOutput}: is an empty tibble when there is no group by condition specified, and a tibble 
-  with the aggregated value for each group when it is
+  \item \strong{intermediateOutput}: is an empty tibble when there is no group by condition specified, 
+  and a tibble with the aggregated value for each group when it is
   \item \strong{output}: a tibble with 3 columns:
     \enumerate{
-    \item \strong{Group}: represents group name when there is a group by condition specified and the row number in the case that there is no group by condition
-    \item \strong{Indices}: the row numbers corresponding to each group when there is a group by specified and row numbers of the data frame in the case that there is no group by condition
-    \item \strong{IsTrue}: flag indicating if the data point/ set of data points satisfies the rule or not. Returns TRUE if the point or group satisfies the rule and FALSE if not.  
+    \item \strong{Group}: represents group name when there is a group by condition specified and the 
+    row number in the case that there is no group by condition
+    \item \strong{Indices}: the row numbers corresponding to each group when there is a group by 
+    specified and row numbers of the data frame in the case that there is no group by condition
+    \item \strong{IsTrue}: flag indicating if the data point/ set of data points satisfies the rule 
+    or not. Returns TRUE if the point or group satisfies the rule and FALSE if not.  
     }
    }
 }
 \description{
-The \emph{executeRulesOnDataset} function is an intuitive interface to execute rules on datasets, which is explicitly designed for data scientists. As input to this function rules are defined using the typical language of data science with verbs such as filter, group by and aggregate. Rules can be specified in a .csv file, loaded into the R session and passed to this function
+The \emph{executeRulesOnDataset} function is an intuitive interface to execute rules on 
+datasets, which is explicitly designed for data scientists. As input to this function rules are defined using the typical language of data science with verbs such as filter, group by and aggregate. Rules can be specified in a .csv file, loaded into the R session and passed to this function
 }
 \details{
 The vignette provides further details on the format of the rules file
@@ -35,10 +39,10 @@ The vignette provides further details on the format of the rules file
   library(Rdrools)
   data(transactionData)
   data(transactionRules)
-  executeRulesOnDataset(transactionsData, transactionsRules)
+  executeRulesOnDataset(transactionData, transactionRules)
 }
 \seealso{
-\code{\link{runRulesDrl}}, \code{\link{Rdrools}}
+\code{\link{runRulesDrl}}
 }
 \author{
 Dheekshitha PS < Dheekshitha.PS@mu-sigma.com>
@@ -47,3 +51,5 @@ Naren Srinivasan <Naren.Srinivasan@mu-sigma.com>
 
 Mayukh Bose <Mayukh.Bose@mu-sigma.com>
 }
+\keyword{rulesSessionDrl}
+\keyword{runRulesDrl}
