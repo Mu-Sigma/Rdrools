@@ -5,11 +5,11 @@ date: "7/4/2018"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Executing business rules at scale using RDrools - an interface to Drools}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-```{r echo = FALSE, message = FALSE, results = 'hide', warning = FALSE, error=FALSE}
+```{r echo = FALSE, message = FALSE, results = 'hide', warning = FALSE, error=FALSE, screenshot.force=FALSE}
 #Package installation if required for handbook
 required.packages <- c('rJava','Rdrools', 'Rdroolsjars','DT','lubridate','tidyverse','plotly')
 
@@ -61,7 +61,6 @@ sampleRules <- irisRules
 rownames(sampleRules) <- seq(1:nrow(sampleRules))
 sampleRules[is.na(sampleRules)]    <-""
 sampleRules
-getwd()
 ```
 
 Through this function, various typical types of rules can be executed with a combination of the **verbs** described above.
@@ -92,9 +91,16 @@ The output has three objects:
 
 The output obtained can be visualized by plotting the graphs of the distribution of true and false in the output. *true* here represents the points which satisfy the rule i.e *Species=setosa* and false represents the points which are not setosa.
 
-
-
 ```{r, warning=FALSE,message=FALSE}
+#' Vignette helper functions
+#' @description: Function plot graphs in the vignette
+#' -----------------------------------------------------------------------------
+#' @param result result of rule check
+#' @param plotName Plot to be generated
+#' @param rules the rules defined in csv format
+#' -----------------------------------------------------------------------------
+#' @return a plotly plot
+#' @keywords internal
 
 plotgraphs <- function(result,plotName){
   
@@ -149,23 +155,12 @@ plotgraphs <- function(result,plotName){
     })
   }
 }
-
-
-
-
-
-
-
-
 ```
 
 ```{r}
-
 anomaliesCountGraph <- plotgraphs(result=filterRuleOutput, plotName="Plot of points distribution")
 anomaliesCountGraph[[1]][[1]]
 ```
-
-
 
 ### Applying a condition on aggregated grouped data
 
@@ -195,24 +190,12 @@ anomalousSetGraph<-plotgraphs(result=groupedAggregationRuleOutput, plotName="Plo
 anomalousSetGraph[[1]][[1]]
 ```
 
-
-
-
 The above graph shows the groups i.e, the *Species* for which the average of *Sepal.Length* is greater than or equal to 5.9. The Y-axis shows the average *Sepal.Length* for each *Species*.
-
-
 
 ```{r, warning=FALSE,message=FALSE}
 anomaliesCountGraph<-plotgraphs(result=groupedAggregationRuleOutput, plotName="Plot of points distribution")
 anomaliesCountGraph[[1]][[1]]
 ```
-
-
-
-
-
-
-
 
 ### Applying an aggregation on a column
 
@@ -220,7 +203,6 @@ This type of rule allows the data scientist to aggregate an entire column and co
 In the case of the **iris** dataset, we aggregate the *Sepal.Length* variable across all cases, and check if it is less than a threshold value
 
 To illustrate this case, we apply only rule 3 from the set of sample rules.
-
 
 ```{r,comment=NA}
 columnAggregationRule <- sampleRules[3,]
@@ -285,14 +267,7 @@ anomalousSetGraph<-plotgraphs(result=filterGroupByAggrRuleOutput, plotName="Plot
 anomalousSetGraph[[1]][[1]]
 ```
 
-
------
-
-
 The above graph shows the groups i.e, the *Species* for which the average of *Petal.Length* is less than 5. The Y-axis shows the average *Petal.Length* for each *Species*.
-
-
-
 ### Applying a condition to compare columns
 
 Here we compare values of two columns. In the case of the **iris** dataset, we compare the *Petal.Length* with *Sepal.Width*, and identify the *rows* which have a *Petal.Length* greater than *Sepal.Width*. 
@@ -313,9 +288,6 @@ The output has three objects:
     * **Group**: the above rule has no group by and filter. Hence the rule is applied to each row. Group, in this case, represents the row
     * **Indices**: the row numbers of the each group
     * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the *Petal.Length* greater than *Sepal.Width*   and *false* if it's not
-
-
-
 
 ```{r, warning=FALSE,message=FALSE}
 anomaliesCountGraph<-plotgraphs(result=compareColumnsRuleOutput, plotName="Plot of points distribution")
@@ -343,15 +315,10 @@ The output has three objects:
     * **Indices**: the row numbers of the each group
     * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the *Petal.Length* of *Versicolor* species is greater than *Sepal.Width*   and *false* if it's not
 
-
-
-
 ```{r, warning=FALSE,message=FALSE}
 anomaliesCountGraph<-plotgraphs(result=compareColumnsRuleOutput, plotName="Plot of points distribution")
 anomaliesCountGraph[[1]][[1]]
 ```
-
-
 
 # Use case
 
@@ -391,13 +358,9 @@ datatable(
 ))
 ```
 
-
-------
 ```{r,comment=NA,echo=FALSE}
 str(transactionData)
 ```
-
-------
 
 ## Defining the rules file
 
@@ -409,8 +372,6 @@ In our case we check rules like:
   + If the number of transactions done by the customer in a month exceeds more than 20 then the customer can be fraudulent
   + If the transaction amount exceeds the more than a threshold then the account can be fraudulent
   
-
-
 ```{r,comment=NA}
 data(transactionRules)
 rownames(transactionRules) <- seq(1:nrow(transactionRules))
@@ -422,8 +383,6 @@ transactionRules
 One example of the rules to mark anomalous transactions from the above list is
 
 $$\textsf{For an account, the total Transaction_Amount } \\  \textsf{should be greater than or equal to USD 40,000}$$ 
-
-
 
 ## Executing rules on the dataset
 
@@ -451,9 +410,6 @@ The output has three objects:
     * **Indices**: the row numbers of the data frame under each *Account_ID* 
     * **IsTrue**: flag to say if the *Account_ID* is anomalous or not. 
 
-
-
-
 ## Plotting graphs of the result obtained
 
 The distribution of points i.e, the *Account_ID* that are true or false is shown in the graph below. In this case, the true values can be called as **Anomalous Account_IDs** and the points that are false are **Non-Anomalous Account_IDs**.
@@ -464,10 +420,8 @@ anomaliesCountGraph<-plotgraphs(result=transactionDataOutput, plotName="Plot of 
 ```
 
 ```{r, warning=FALSE,message=FALSE}
-
 anomaliesCountGraph[[5]][[5]]
 ```
-
 
 The above graph shows that there are 4 anomalous Account_IDs which satisfy the rule given and 7 Account_IDs that are non-anomalous.
 
@@ -476,8 +430,6 @@ anomalousSetGraph<-plotgraphs(result=transactionDataOutput, plotName="Plot of gr
 anomalousSetGraph[[5]][[5]]
 ```
 The above graph gives more information about the anomalous Account_IDs. The graph shows the sum of *Transaction_Amount* for each anomalous *Account_ID*
-
-
 
 # References
 

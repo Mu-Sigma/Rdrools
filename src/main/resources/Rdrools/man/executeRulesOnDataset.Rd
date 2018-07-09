@@ -10,8 +10,6 @@ executeRulesOnDataset(dataset, rules)
 \item{dataset}{a data frame on which the defined set of rules should be applied}
 
 \item{rules}{a data frame in which rules are defined}
-
-\item{row}{a row from the data frame of rules provided as a list}
 }
 \value{
 A list of input, intermediate output and output per rule
@@ -29,26 +27,24 @@ A list of input, intermediate output and output per rule
     or not. Returns TRUE if the point or group satisfies the rule and FALSE if not.  
     }
    }
-
-A string with the rule in DRL format
 }
 \description{
 The \emph{executeRulesOnDataset} function is an intuitive interface to execute rules on 
 datasets, which is explicitly designed for data scientists. As input to this function rules are defined using the typical language of data science with verbs such as filter, group by and aggregate. Rules can be specified in a .csv file, loaded into the R session and passed to this function
 
-This function transforms a rule into the DRL format accepted by the Drools engine
+Internal function to return the rule in DRL format
 }
 \details{
 The vignette provides further details on the format of the rules file
 }
 \examples{
   library(Rdrools)
-  data(transactionData)
-  data(transactionRules)
-  executeRulesOnDataset(transactionData, transactionRules)
+  data("iris")
+  data("irisRules")
+  executeRulesOnDataset(iris, irisRules)
 }
 \seealso{
-\code{\link{runRulesDrl}},\code{\link{Rdrools}}
+\code{\link{runRulesDrl}}, \code{\link{Rdrools}}
 }
 \author{
 Dheekshitha PS < Dheekshitha.PS@mu-sigma.com>

@@ -13,6 +13,8 @@ Authors@R: c(person("Dheekshitha","PS", email = "Dheekshitha.PS@mu-sigma.com", r
 Maintainer: Naren Srinivasan <Naren.Srinivasan@mu-sigma.com>
 Description: An interface for using the popular Java based Drools, which is a Business Rule Management System (See <https://www.drools.org> for more information). This package allows you to run a set of rules written in DRL format on the data using the Drools engine. Credits to Mu Sigma for their continued support throughout the development of the package.
 Depends: R (>= 3.0.0), rJava, Rdroolsjars (>= 1.0.0), tidyverse
+Suggests: knitr,
+    testthat
 SystemRequirements: Java (>= 7.0)
 License: Apache License 2.0
 LazyLoad: yes

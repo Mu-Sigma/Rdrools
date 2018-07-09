@@ -47,7 +47,7 @@
 #' @author Naren Srinivasan <Naren.Srinivasan@mu-sigma.com>
 #' @author Mayukh Bose <Mayukh.Bose@mu-sigma.com>
 #' 
-#' @seealso \code{\link{runRulesDrl}},\code{\link{Rdrools}}
+#' @seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
 #' 
 #' @examples
 #'   library(Rdrools)
@@ -71,13 +71,8 @@ executeRulesOnDataset <- function(dataset, rules){
   
   rules[is.na(rules)] <- ""
   
-  #'@name getRuleInDrl
-  #'@aliases getRuleInDrl
-  #'@title Transform a rule into DRL format
-  #'@description This function transforms a rule into the DRL format accepted by the Drools engine
-  #'@param row a row from the data frame of rules provided as a list
-  #'@return  A string with the rule in DRL format
-  #'@keywords internal
+#' @description Internal function to return the rule in DRL format
+#' @keywords internal
   getRuleInDrl <- function(rowList){
     ruleNum <- rowList$ruleNum
     filterCond <- rowList$Filters
@@ -710,5 +705,3 @@ getDrlForRowwiseRules <- function(dataset, rules, ruleNum, input.columns,
     append(.,'end')->drlRules
   return(drlRules)  
 }
-
-

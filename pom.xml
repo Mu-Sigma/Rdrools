@@ -108,7 +108,7 @@
 								<echo>Building the Rdrools package</echo>
 								<exec dir="${basedir}/build" executable="/bin/sh">
 									<arg value="-c" />
-									<arg value="R CMD build Rdrools" />
+									<arg value="R CMD build --resave-data Rdrools" />
 								</exec>
 								
 								<echo>Installing the Rdroolsjars package....</echo>
