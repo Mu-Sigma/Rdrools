@@ -235,7 +235,7 @@ executeRulesOnDataset <- function(dataset, rules){
   outputWithAllRows <- list()
   outputDfForEachRule <- list()
   # running the loop to get drl format for all the rules
-  rules %>% dplyr::mutate(ruleNum = 1:dplyr::n()) -> rules
+  rules %>% dplyr::mutate(ruleNum = 1:n()) -> rules
   rules %>% dplyr::rowwise() %>% dplyr::do(getRuleInDrl(.data)) -> resultTib
   inp <- resultTib$input    
   interOut <- resultTib$intermediateOutput
@@ -569,11 +569,11 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
     #getting the first and last row for each group
     outputFormatted <-  eval(parse(text=paste('outputDf %>% dplyr::group_by(',
                                               groupByColumn,') %>% 
-                                              dplyr::slice(c(1,dplyr::n())) %>% dplyr::ungroup()')))  
+                                              dplyr::slice(c(1,n())) %>% dplyr::ungroup()')))  
     #getting the last row for each group
     outputDfForEachRule <- eval(parse(text=paste('outputDf %>% 
                                                  dplyr::group_by(', groupByColumn, ') %>% 
-                                                 dplyr::slice(c(dplyr::n())) %>% dplyr::ungroup()')))
+                                                 dplyr::slice(c(n())) %>% dplyr::ungroup()')))
     #adding new column, Indices
     groupByColumn <-unlist(strsplit(groupByColumn,","))
     outputDf<- outputDfForEachRule[,c(groupByColumn,ruleName,ruleValue)]
@@ -597,7 +597,7 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
       if(aggregationFunc != "compare" && aggregationFunc != ""){
         # agg on whole column  
         # getting the last row
-        outputFormatted <- tibble::as_tibble(outputDf) %>% dplyr::slice(dplyr::n())
+        outputFormatted <- tibble::as_tibble(outputDf) %>% dplyr::slice(n())
         
         ifelse(outputFormatted[,ruleName][1,]=='true',
                outputDf[c(1:nrow(outputDf)), ruleName] <-"true",
