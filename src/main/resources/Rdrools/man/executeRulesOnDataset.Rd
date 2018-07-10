@@ -36,11 +36,12 @@ datasets, which is explicitly designed for data scientists. As input to this fun
 The vignette provides further details on the format of the rules file
 }
 \examples{
+\dontrun{
   library(Rdrools)
   data("iris")
-  iris <- iris[1:10,]
   data("irisRules")
   executeRulesOnDataset(iris, irisRules)
+  }
 }
 \seealso{
 \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
