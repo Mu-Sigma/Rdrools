@@ -3,18 +3,19 @@
 
 if (!requireNamespace("DT", quietly = TRUE)) {
      install.packages("DT", repos = "http://cloud.r-project.org/")
-     library("DT")
 }
 
 if (!requireNamespace("lubridate", quietly = TRUE)) {
      install.packages("lubridate", repos = "http://cloud.r-project.org/")
-     library("lubridate")
 }
-if (!requireNamespace("plotly", quietly = TRUE)) {
-     install.packages("plotly", repos = "http://cloud.r-project.org/")
-     library("plotly")
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+     install.packages("ggplot2", repos = "http://cloud.r-project.org/")
 }
+library("magrittr")
 library("Rdrools")
+library("dplyr")
+library("purrr")
+library("tibble")
 
 ## ----setup, include=FALSE------------------------------------------------
 options(stringsAsFactors = F)

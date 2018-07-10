@@ -1,0 +1,6 @@
+Filters,GroupBy,Column,Function,Operation,Argument
+Credit_Card_Monthly_Expenditure > 28000,,,,,
+,"Account_ID,Month",Transaction_Amount,sum,>=,10000
+,,Total_Transactions,max,>,5
+risk_level == 'Low',,Transaction_Amount,average,<,1400
+Date > '2017-05-01' && Credit_Debit_Indicator == 'Debit',Account_ID,Transaction_Amount,sum,>=,40000
