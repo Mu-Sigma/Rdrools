@@ -31,9 +31,11 @@ using either salience or the Reete algorithm are also present in the references.
 
 \strong{Transformation policy} Transformations are applied row by row, iteratively. That is to say, 
 all inputs required for a rule transformation should be present in columns as a part of that row 
-itself. Each row should be considered #'independent of another; all input values required for a
+itself. Each row should be considered 
+independent of another; all input values required for a
 transformation should be available in that row itself. The expectation from rules engines are 
 often misplaced.
+
 \strong{Column Mismatch} Please make sure that the list of output columns provided through the 
 \code{output.columns} parameter is exhaustive. Any additional column which is created through the 
 rules transformation but is not present in the list would inhibit proper functioning. In most cases,
@@ -50,11 +52,12 @@ output.df<-runRulesDrl(rulesSession, class)
 }
 \seealso{
 \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
+
+Other Interface Functions to Drools: \code{\link{executeRulesOnDataset}},
+  \code{\link{rulesSessionDrl}}
 }
 \author{
 Ashwin Raaghav <ashwin.raaghav@mu-sigma.com>
 
 SMS Chauhan <sms.chauhan@mu-sigma.com>
 }
-\keyword{rulesSessionDrl}
-\keyword{runRulesDrl}

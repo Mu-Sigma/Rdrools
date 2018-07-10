@@ -2,7 +2,7 @@
 % Please edit documentation in R/Rdrools.R
 \name{getConditionForMultiGroupBy}
 \alias{getConditionForMultiGroupBy}
-\title{-----------------------------------------------------------------------------}
+\title{Get rules for group by conditions}
 \usage{
 getConditionForMultiGroupBy(groupByColumn, aggregationFunc, aggregationColumn)
 }
@@ -12,8 +12,7 @@ getConditionForMultiGroupBy(groupByColumn, aggregationFunc, aggregationColumn)
 \item{aggregationFunc}{aggregation function to be applied}
 
 \item{aggregationColumn}{column on which aggregation function is to be 
-applied  
------------------------------------------------------------------------------}
+applied}
 }
 \value{
 required rule condition
@@ -21,5 +20,5 @@ required rule condition
 \description{
 : This function is used to get the required rule condition when 
 there are multiple groupby columns
------------------------------------------------------------------------------
 }
+\keyword{internal}

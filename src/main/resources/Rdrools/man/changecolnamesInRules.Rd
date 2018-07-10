@@ -2,15 +2,14 @@
 % Please edit documentation in R/Rdrools.R
 \name{changecolnamesInRules}
 \alias{changecolnamesInRules}
-\title{-----------------------------------------------------------------------------}
+\title{Standardize column names for passing to the rule engine}
 \usage{
 changecolnamesInRules(dataset, rules)
 }
 \arguments{
 \item{dataset}{the data frame on which rules are to be run}
 
-\item{rules}{rules defined in a csv file 
------------------------------------------------------------------------------}
+\item{rules}{rules defined in a csv file}
 }
 \value{
 rules in required format
@@ -18,6 +17,5 @@ rules in required format
 \description{
 : This function is used to remove the . or _ in column names of
  the dataset present in the rules file
------------------------------------------------------------------------------
 }
 \keyword{internal}

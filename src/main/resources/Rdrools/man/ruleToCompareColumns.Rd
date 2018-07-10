@@ -2,7 +2,7 @@
 % Please edit documentation in R/Rdrools.R
 \name{ruleToCompareColumns}
 \alias{ruleToCompareColumns}
-\title{-----------------------------------------------------------------------------}
+\title{Get DRL rules for comparing columns}
 \usage{
 ruleToCompareColumns(dataset, rules, ruleNum)
 }
@@ -11,8 +11,7 @@ ruleToCompareColumns(dataset, rules, ruleNum)
 
 \item{rules}{the rules defined in csv format}
 
-\item{ruleNum}{number of the rule which has condition to compare columns
------------------------------------------------------------------------------}
+\item{ruleNum}{number of the rule which has condition to compare columns}
 }
 \value{
 output in required format
@@ -20,6 +19,5 @@ output in required format
 \description{
 : This function is used to get drl rule for rules involving
  comparing columns
------------------------------------------------------------------------------
 }
 \keyword{internal}

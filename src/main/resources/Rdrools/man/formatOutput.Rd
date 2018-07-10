@@ -2,7 +2,7 @@
 % Please edit documentation in R/Rdrools.R
 \name{formatOutput}
 \alias{formatOutput}
-\title{-----------------------------------------------------------------------------}
+\title{Format output into required format}
 \usage{
 formatOutput(dataset, outputDf, rules, filteredDataFalse, input.columns,
   ruleNum)
@@ -20,8 +20,7 @@ function}
 \item{input.columns}{the input columns of the dataset which is obtained
 from getrequiredColumns function}
 
-\item{ruleNum}{the number of the rule currently being run
------------------------------------------------------------------------------}
+\item{ruleNum}{the number of the rule currently being run}
 }
 \value{
 output in required format
@@ -29,6 +28,5 @@ output in required format
 \description{
 : This function is used to change the output of the rules 
 involving groupby
------------------------------------------------------------------------------
 }
 \keyword{internal}

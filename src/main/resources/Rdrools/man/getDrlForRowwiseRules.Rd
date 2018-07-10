@@ -2,15 +2,14 @@
 % Please edit documentation in R/Rdrools.R
 \name{getDrlForRowwiseRules}
 \alias{getDrlForRowwiseRules}
-\title{-----------------------------------------------------------------------------}
+\title{DRL format for rules to be applied row-wise}
 \usage{
 getDrlForRowwiseRules(dataset, rules, ruleNum, input.columns, output.columns)
 }
 \arguments{
 \item{dataset}{rules defined in a csv file}
 
-\item{rules}{the rules defined in csv format
------------------------------------------------------------------------------}
+\item{rules}{the rules defined in csv format}
 
 \item{outputDf}{the output data frame returned by the executeRulesOnDataset 
 function}
@@ -21,6 +20,5 @@ drl format of rules for row wise rules
 \description{
 : This function is used to get the drl format of rules for row 
 wise rules
------------------------------------------------------------------------------
 }
 \keyword{internal}

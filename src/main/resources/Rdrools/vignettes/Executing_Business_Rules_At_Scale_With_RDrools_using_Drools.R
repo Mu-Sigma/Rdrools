@@ -1,4 +1,4 @@
-## ----echo = FALSE, message = FALSE, results = 'hide', warning = FALSE, error=FALSE----
+## ----echo = FALSE, message = FALSE, results = 'hide', warning = FALSE, error=FALSE, screenshot.force=FALSE----
 #Package installation if required for handbook
 required.packages <- c('rJava','Rdrools', 'Rdroolsjars','DT','lubridate','tidyverse','plotly')
 

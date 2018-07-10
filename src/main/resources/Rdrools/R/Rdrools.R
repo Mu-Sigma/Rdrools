@@ -22,7 +22,7 @@
 #'@name executeRulesOnDataset
 #'@aliases executeRulesOnDataset
 #'@title Run a set of rules on a dataset
-#'@description The \emph{executeRulesOnDataset} function is an intuitive interface to execute rules on 
+#'@description The \code{executeRulesOnDataset} function is an intuitive interface to execute rules on 
 #'datasets, which is explicitly designed for data scientists. As input to this function rules are defined using the typical language of data science with verbs such as filter, group by and aggregate. Rules can be specified in a .csv file, loaded into the R session and passed to this function
 #'@usage executeRulesOnDataset(dataset, rules)
 #'@param dataset a data frame on which the defined set of rules should be applied
@@ -54,8 +54,7 @@
 #'   data("iris")
 #'   data("irisRules")
 #'   executeRulesOnDataset(iris, irisRules)
-#' @keywords rulesSessionDrl 
-#' @keywords runRulesDrl 
+#' @family Interface Functions to Drools
 executeRulesOnDataset <- function(dataset, rules){
   if(nrow(dataset) == 0){
     stop("Dataset cannot be empty")
@@ -71,8 +70,7 @@ executeRulesOnDataset <- function(dataset, rules){
   
   rules[is.na(rules)] <- ""
   
-#' @description Internal function to return the rule in DRL format
-#' @keywords internal
+  
   getRuleInDrl <- function(rowList){
     ruleNum <- rowList$ruleNum
     filterCond <- rowList$Filters
@@ -281,9 +279,7 @@ executeRulesOnDataset <- function(dataset, rules){
 #' output.columns<-c('address', 'subject', 'body')
 #' rulesSession<-rulesSessionDrl(rules, input.columns, output.columns)
 #' output.df<-runRulesDrl(rulesSession, class)
-#'@keywords runRulesDrl 
-#'@keywords rulesSessionDrl 
-
+#' @family Interface Functions to Drools
 rulesSessionDrl <- function(rules, input.columns, output.columns) {
   rules <- paste(rules, collapse='\n')
   input.columns <- paste(input.columns,collapse=',')
@@ -315,9 +311,11 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #'@details
 #'\strong{Transformation policy} Transformations are applied row by row, iteratively. That is to say, 
 #'all inputs required for a rule transformation should be present in columns as a part of that row 
-#'itself. Each row should be considered #'independent of another; all input values required for a
+#'itself. Each row should be considered 
+#'independent of another; all input values required for a
 #' transformation should be available in that row itself. The expectation from rules engines are 
 #' often misplaced.
+#' @details
 #'\strong{Column Mismatch} Please make sure that the list of output columns provided through the 
 #'\code{output.columns} parameter is exhaustive. Any additional column which is created through the 
 #'rules transformation but is not present in the list would inhibit proper functioning. In most cases,
@@ -333,9 +331,7 @@ rulesSessionDrl <- function(rules, input.columns, output.columns) {
 #' output.columns<-c('address', 'subject', 'body')
 #' rulesSession<-rulesSessionDrl(rules, input.columns, output.columns)
 #' output.df<-runRulesDrl(rulesSession, class)
-#'@keywords runRulesDrl 
-#'@keywords rulesSessionDrl 
-
+#' @family Interface Functions to Drools
 runRulesDrl<-function(rules.session,input.df) {
   conn <- textConnection('input.csv.string','w')
   write.csv(input.df,file=conn)
@@ -351,18 +347,16 @@ runRulesDrl<-function(rules.session,input.df) {
 
 #### Helper functions ######
 
-#' -----------------------------------------------------------------------------
+#' @name getConditionForMultiGroupBy
+#' @title Get rules for group by conditions
 #' @description: This function is used to get the required rule condition when 
 #' there are multiple groupby columns
-#' -----------------------------------------------------------------------------
 #' @param groupByColumn columns to groupby
 #' @param aggregationFunc aggregation function to be applied 
 #' @param aggregationColumn column on which aggregation function is to be 
 #' applied  
-#' -----------------------------------------------------------------------------
 #' @return required rule condition 
-#'
-
+#' @keywords internal
 getConditionForMultiGroupBy <- function(groupByColumn, aggregationFunc, 
                                         aggregationColumn){
   
@@ -384,13 +378,12 @@ getConditionForMultiGroupBy <- function(groupByColumn, aggregationFunc,
   return(ruleCondition)
 }
 
-#' -----------------------------------------------------------------------------
+#' @name getrequiredColumns
+#' @title Get the required columns for rule checking
 #' @description: This function is used to get the required input and output 
 #' columns
-#' -----------------------------------------------------------------------------
 #' @param dataset the data frame on which rules are to be run
 #' @param rules rules defined in a csv file
-#' -----------------------------------------------------------------------------
 #' @return required input columns and output columns
 #' @keywords internal
 getrequiredColumns <- function(dataset,rules){
@@ -416,16 +409,14 @@ getrequiredColumns <- function(dataset,rules){
               output.columns=unlist(output.columns)))
 }
 
-#' -----------------------------------------------------------------------------
+#' @name changecolnamesInRules
+#' @title Standardize column names for passing to the rule engine
 #' @description: This function is used to remove the . or _ in column names of
 #'  the dataset present in the rules file
-#' -----------------------------------------------------------------------------
 #' @param dataset the data frame on which rules are to be run
 #' @param rules rules defined in a csv file 
-#' -----------------------------------------------------------------------------
 #' @return rules in required format
 #' @keywords internal
-
 changecolnamesInRules <-function(dataset,rules){
   
   formattedRules <- rules
@@ -441,11 +432,10 @@ changecolnamesInRules <-function(dataset,rules){
   
 }
 
-
-#' -----------------------------------------------------------------------------
+#' @name getDrlForFilterRules
+#' @title DRL rules for Fiter condition
 #' @description: This function is used to get the drl format for the rules 
 #' which have filters
-#' -----------------------------------------------------------------------------
 #' @param dataset data frame on which rules are to be run
 #' @param rules rules in csv format
 #' @param ruleNum the number of the current rule 
@@ -453,7 +443,6 @@ changecolnamesInRules <-function(dataset,rules){
 #' @param input.columns input columns which are obtained from getrequiredColumns
 #' @param output.columns output columns which are obtained from 
 #' getrequiredColumns
-#' -----------------------------------------------------------------------------
 #' @return filtered output with flags true/false
 #' @keywords internal
 getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols, 
@@ -507,17 +496,15 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
   return(filteredOutput)
 }
 
-#' -----------------------------------------------------------------------------
+#' @name ruleToCompareColumns
+#' @title Get DRL rules for comparing columns
 #' @description: This function is used to get drl rule for rules involving
 #'  comparing columns
-#' -----------------------------------------------------------------------------
 #' @param dataset data frame on which rules are to be run
 #' @param rules the rules defined in csv format
 #' @param ruleNum number of the rule which has condition to compare columns
-#' -----------------------------------------------------------------------------
 #' @return output in required format
 #' @keywords internal
-
 ruleToCompareColumns <- function(dataset, rules, ruleNum){
   
   aggregationColumn <- rules[ruleNum,"Column"]
@@ -555,10 +542,10 @@ ruleToCompareColumns <- function(dataset, rules, ruleNum){
   
 }
 
-#' -----------------------------------------------------------------------------
+#' @name formatOutput
+#' @title Format output into required format
 #' @description: This function is used to change the output of the rules 
 #' involving groupby
-#' -----------------------------------------------------------------------------
 #' @param dataset rules defined in a csv file
 #' @param outputDf the output data frame returned by the executeRulesOnDataset 
 #' function
@@ -567,10 +554,8 @@ ruleToCompareColumns <- function(dataset, rules, ruleNum){
 #' @param input.columns the input columns of the dataset which is obtained
 #' from getrequiredColumns function
 #' @param ruleNum the number of the rule currently being run
-#' -----------------------------------------------------------------------------
 #' @return output in required format
 #' @keywords internal
-
 formatOutput <- function(dataset, outputDf, rules, filteredDataFalse, 
                          input.columns, ruleNum){
   # adding row number as a column to identify the last and first row for each group
@@ -665,19 +650,16 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
   return(list(outputDf=outputDf,outputDfForEachRule=outputDfForEachRule))
 }
 
-
-#' -----------------------------------------------------------------------------
+#' @name getDrlForRowwiseRules
+#' @title DRL format for rules to be applied row-wise
 #' @description: This function is used to get the drl format of rules for row 
 #' wise rules
-#' -----------------------------------------------------------------------------
 #' @param dataset rules defined in a csv file
 #' @param outputDf the output data frame returned by the executeRulesOnDataset 
 #' function
 #' @param rules the rules defined in csv format
-#' -----------------------------------------------------------------------------
 #' @return drl format of rules for row wise rules
 #' @keywords internal
-
 getDrlForRowwiseRules <- function(dataset, rules, ruleNum, input.columns, 
                                   output.columns){
   

@@ -29,10 +29,8 @@ A list of input, intermediate output and output per rule
    }
 }
 \description{
-The \emph{executeRulesOnDataset} function is an intuitive interface to execute rules on 
+The \code{executeRulesOnDataset} function is an intuitive interface to execute rules on 
 datasets, which is explicitly designed for data scientists. As input to this function rules are defined using the typical language of data science with verbs such as filter, group by and aggregate. Rules can be specified in a .csv file, loaded into the R session and passed to this function
-
-Internal function to return the rule in DRL format
 }
 \details{
 The vignette provides further details on the format of the rules file
@@ -45,6 +43,9 @@ The vignette provides further details on the format of the rules file
 }
 \seealso{
 \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
+
+Other Interface Functions to Drools: \code{\link{rulesSessionDrl}},
+  \code{\link{runRulesDrl}}
 }
 \author{
 Dheekshitha PS < Dheekshitha.PS@mu-sigma.com>
@@ -53,6 +54,3 @@ Naren Srinivasan <Naren.Srinivasan@mu-sigma.com>
 
 Mayukh Bose <Mayukh.Bose@mu-sigma.com>
 }
-\keyword{internal}
-\keyword{rulesSessionDrl}
-\keyword{runRulesDrl}

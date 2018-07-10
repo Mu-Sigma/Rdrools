@@ -2,7 +2,7 @@
 % Please edit documentation in R/Rdrools.R
 \name{getDrlForFilterRules}
 \alias{getDrlForFilterRules}
-\title{-----------------------------------------------------------------------------}
+\title{DRL rules for Fiter condition}
 \usage{
 getDrlForFilterRules(dataset, rules, ruleNum, outputCols, input.columns,
   output.columns)
@@ -19,8 +19,7 @@ getDrlForFilterRules(dataset, rules, ruleNum, outputCols, input.columns,
 \item{input.columns}{input columns which are obtained from getrequiredColumns}
 
 \item{output.columns}{output columns which are obtained from 
-getrequiredColumns
------------------------------------------------------------------------------}
+getrequiredColumns}
 }
 \value{
 filtered output with flags true/false
@@ -28,6 +27,5 @@ filtered output with flags true/false
 \description{
 : This function is used to get the drl format for the rules 
 which have filters
------------------------------------------------------------------------------
 }
 \keyword{internal}

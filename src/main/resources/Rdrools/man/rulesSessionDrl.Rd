@@ -44,11 +44,12 @@ output.df<-runRulesDrl(rulesSession, class)
 }
 \seealso{
 \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
+
+Other Interface Functions to Drools: \code{\link{executeRulesOnDataset}},
+  \code{\link{runRulesDrl}}
 }
 \author{
 Ashwin Raaghav <ashwin.raaghav@mu-sigma.com>
 
 SMS Chauhan <sms.chauhan@mu-sigma.com>
 }
-\keyword{rulesSessionDrl}
-\keyword{runRulesDrl}

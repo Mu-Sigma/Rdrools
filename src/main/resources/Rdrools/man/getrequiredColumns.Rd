@@ -2,15 +2,14 @@
 % Please edit documentation in R/Rdrools.R
 \name{getrequiredColumns}
 \alias{getrequiredColumns}
-\title{-----------------------------------------------------------------------------}
+\title{Get the required columns for rule checking}
 \usage{
 getrequiredColumns(dataset, rules)
 }
 \arguments{
 \item{dataset}{the data frame on which rules are to be run}
 
-\item{rules}{rules defined in a csv file
------------------------------------------------------------------------------}
+\item{rules}{rules defined in a csv file}
 }
 \value{
 required input columns and output columns
@@ -18,6 +17,5 @@ required input columns and output columns
 \description{
 : This function is used to get the required input and output 
 columns
------------------------------------------------------------------------------
 }
 \keyword{internal}
