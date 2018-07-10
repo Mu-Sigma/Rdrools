@@ -122,8 +122,9 @@ plotgraphs <- function(result,plotName){
         noOfTrueFalse <- noOfTrueFalse %>% as.data.frame %>% `rownames<-`(c("Anomalies","Non-Anomalies"))  
         anomaliesCountPlot[[i]] <- ggplot2::ggplot(noOfTrueFalse, ggplot2::aes(x=IsTrue, y=Frequency)) +
           ggplot2::geom_bar(stat = "identity", fill="steelblue")+
-          ggplot2::labs(title="Distribution of points for the rule", 
-              y = "Count")
+          ggplot2::labs(title="Distribution of points \n for the rule", 
+              y = "Count") +
+          ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
         
       }else{
         anomaliesCountPlot[[i]] <- NULL
@@ -152,7 +153,9 @@ plotgraphs <- function(result,plotName){
         plotAnomalies[[ruleNum]] <- ggplot2::ggplot(intermediateOutput, ggplot2::aes(x=Group, y=values))+
           ggplot2::geom_bar(stat = "identity",fill="steelblue")+
           ggplot2::labs(title="Groups satisfying the rule", 
-               x=list(title = paste0("Grouped By - ",GroupedCols), tickangle = -45), y = "Aggregated Value")
+               x=list(title = paste0("Grouped By - ",GroupedCols), tickangle = -45), y = "Aggregated Value") +
+          ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
+        
         return(plotAnomalies)
         
       }
@@ -419,7 +422,7 @@ The output has three objects:
 
 The distribution of points i.e, the *Account_ID* that are true or false is shown in the graph below. In this case, the true values can be called as **Anomalous Account_IDs** and the points that are false are **Non-Anomalous Account_IDs**.
 
-```{r, warning=FALSE,message=FALSE}
+```{r, warning=FALSE,message=FALSE, fig.width=12}
 anomaliesCountGraph<-plotgraphs(result=transactionDataOutput, plotName="Plot of points distribution")
 
 ```
@@ -434,6 +437,7 @@ The above graph shows that there are 4 anomalous Account_IDs which satisfy the r
 anomalousSetGraph<-plotgraphs(result=transactionDataOutput, plotName="Plot of groups")
 anomalousSetGraph[[5]][[5]]
 ```
+
 The above graph gives more information about the anomalous Account_IDs. The graph shows the sum of *Transaction_Amount* for each anomalous *Account_ID*
 
 # References
