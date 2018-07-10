@@ -50,11 +50,12 @@
 #' @seealso \code{\link{runRulesDrl}}, \code{\link{Rdrools}}
 #' 
 #' @examples
+#' \dontrun{
 #'   library(Rdrools)
 #'   data("iris")
-#'   iris <- iris[1:10,]
 #'   data("irisRules")
 #'   executeRulesOnDataset(iris, irisRules)
+#'   }
 #' @family Interface Functions to Drools
 executeRulesOnDataset <- function(dataset, rules){
   if(nrow(dataset) == 0){
