@@ -52,7 +52,7 @@
 #' @examples
 #'   library(Rdrools)
 #'   data("iris")
-#'   iris <- iris[1:30,]
+#'   iris <- iris[1:10,]
 #'   data("irisRules")
 #'   executeRulesOnDataset(iris, irisRules)
 #' @family Interface Functions to Drools
