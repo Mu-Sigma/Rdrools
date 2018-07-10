@@ -149,8 +149,8 @@ plotgraphs <- function(result,plotName){
         intermediateOutput$Group <-  apply( intermediateOutput[ , !names(intermediateOutput) %in% c(ruleName,ruleValue) ] , 1 , paste , collapse = ":" )
         colnames(intermediateOutput)[ncol(intermediateOutput)-1] <- "values"
         
-        plotAnomalies[[ruleNum]] <- ggplot2::ggplot(intermediateOutput, ggplot2::aes(x=Group, y=values,fill="blue"))+
-          ggplot2::geom_bar(stat = "identity")+
+        plotAnomalies[[ruleNum]] <- ggplot2::ggplot(intermediateOutput, ggplot2::aes(x=Group, y=values))+
+          ggplot2::geom_bar(stat = "identity",fill="steelblue")+
           ggplot2::labs(title="Groups satisfying the rule", 
                x=list(title = paste0("Grouped By - ",GroupedCols), tickangle = -45), y = "Aggregated Value")
         return(plotAnomalies)
