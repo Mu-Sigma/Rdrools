@@ -38,6 +38,7 @@ The vignette provides further details on the format of the rules file
 \examples{
   library(Rdrools)
   data("iris")
+  iris <- iris[1:30,]
   data("irisRules")
   executeRulesOnDataset(iris, irisRules)
 }

@@ -444,4 +444,4 @@ The above graph gives more information about the anomalous Account_IDs. The grap
 
 [Drools Documentation](https://docs.jboss.org/drools/release/6.2.0.CR1/drools-docs/html_single/)
 
-[Rdrools Documentation]( https://cran.r-project.org/web/packages/Rdrools/Rdrools.pdf )
+[Rdrools Documentation](https://cran.r-project.org/package=Rdrools)
