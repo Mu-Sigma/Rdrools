@@ -120,8 +120,8 @@ plotgraphs <- function(result,plotName){
       if(nrow(noOfTrueFalse)==2){
         
         noOfTrueFalse <- noOfTrueFalse %>% as.data.frame %>% `rownames<-`(c("Anomalies","Non-Anomalies"))  
-        anomaliesCountPlot[[i]] <- ggplot2::ggplot(noOfTrueFalse, ggplot2::aes(x=IsTrue, y=Frequency,fill=IsTrue)) +
-          ggplot2::geom_bar(stat = "identity")+
+        anomaliesCountPlot[[i]] <- ggplot2::ggplot(noOfTrueFalse, ggplot2::aes(x=IsTrue, y=Frequency)) +
+          ggplot2::geom_bar(stat = "identity", fill="steelblue")+
           ggplot2::labs(title="Distribution of points for the rule", 
               y = "Count")
         
