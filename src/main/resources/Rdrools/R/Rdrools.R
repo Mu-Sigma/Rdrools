@@ -125,14 +125,14 @@ executeRulesOnDataset <- function(dataset, rules){
     # Adding the condition for displaying output columns 
     drlRules <-  append(drlRules, outputCols)
     ruleValue <- paste0("Rule", ruleNum, "Value")
-    drlRules %>% append(., paste0("output.put(\"Rule", ruleNum, "\",result", 
+    drlRules %>% append(paste0("output.put(\"Rule", ruleNum, "\",result", 
                                   operation, argument,");")) %>%
-      append(., paste0("output.put(",shQuote(ruleValue),",result);")) %>%
-      append(., 'end') -> drlRules
-    rulesList %>% append(., list(drlRules)) %>% str(.) -> rulesList
+      append( paste0("output.put(",shQuote(ruleValue),",result);")) %>%
+      append('end') -> drlRules
+    rulesList %>% append(list(drlRules)) %>% str -> rulesList
     #storing input rule separately for each rule
     csvFormatOfEachRule %>% 
-      append(., list(rowList %>% as_tibble())) -> csvFormatOfEachRule
+      append(list(rowList %>% tibble::as_tibble())) -> csvFormatOfEachRule
     
     if(filterCond != ""){
       #when there is filter
@@ -141,9 +141,9 @@ executeRulesOnDataset <- function(dataset, rules){
       ruleName <- paste0("Rule", ruleNum)
       filteredData <- filteredData[, c(input.columns, ruleName, ruleValue)]
       filteredData %>% 
-        filter_(., paste(ruleName,"==","'true'")) -> filteredDataTrue
+        dplyr::filter_(.dots = paste(ruleName,"==","'true'")) -> filteredDataTrue
       filteredData %>% 
-        filter_(., paste(ruleName,"==","'false'")) -> filteredDataFalse
+        dplyr::filter_(.dots = paste(ruleName,"==","'false'")) -> filteredDataFalse
       
       if(aggregationFunc == ""){
         if(operation != ""){
@@ -152,10 +152,10 @@ executeRulesOnDataset <- function(dataset, rules){
                                             input.columns, output.columns)
           rules.Session <- rulesSessionDrl(unlist(drlRules), input.columns, 
                                            output.columns)
-          outputDf %>% append(., list(filteredData)) -> outputDf
+          outputDf %>% append(list(filteredData)) -> outputDf
         }else{
           
-          outputDf %>% append(., list(filteredData)) -> outputDf
+          outputDf %>% append(list(filteredData)) -> outputDf
           filteredDataFalse <- NULL
         }
       }else if(aggregationFunc == "compare"){
@@ -164,12 +164,12 @@ executeRulesOnDataset <- function(dataset, rules){
         rules.Session <- rulesSessionDrl(unlist(drlRules), input.columns, 
                                          output.columns)
         outputDf %>% 
-          append(., list(runRulesDrl(rules.Session, filteredDataTrue))) -> outputDf
+          append(list(runRulesDrl(rules.Session, filteredDataTrue))) -> outputDf
       }else{
         rules.Session <- rulesSessionDrl(unlist(drlRules), input.columns,
                                          output.columns)
         outputDf %>% 
-          append(., list(runRulesDrl(rules.Session, filteredDataTrue))) -> outputDf
+          append(list(runRulesDrl(rules.Session, filteredDataTrue))) -> outputDf
       }
     }else{
       
@@ -184,17 +184,17 @@ executeRulesOnDataset <- function(dataset, rules){
       rules.Session <- rulesSessionDrl(unlist(drlRules), input.columns,
                                        output.columns)
       outputDf %>% 
-        append(., list(unique(runRulesDrl(rules.Session,dataset)))) -> outputDf
+        append(list(unique(runRulesDrl(rules.Session,dataset)))) -> outputDf
     }
     outputWithAllRows %>% 
-      append(., list(formatOutput(dataset = dataset, 
+      append(list(formatOutput(dataset = dataset, 
                                   outputDf = outputDf[[length(outputDf)]],
                                   rules = rules,
                                   filteredDataFalse = filteredDataFalse,
                                   input.columns=input.columns, 
                                   ruleNum= ruleNum)$outputDf)) -> outputWithAllRows
     outputDfForEachRule %>% 
-      append(., list(formatOutput(dataset = dataset, 
+      append(list(formatOutput(dataset = dataset, 
                                   outputDf = outputDf[[length(outputDf)]],
                                   rules = rules, 
                                   filteredDataFalse = filteredDataFalse,
@@ -203,7 +203,7 @@ executeRulesOnDataset <- function(dataset, rules){
     
     intermediateOutput <- outputWithAllRows
     
-    resultTibble = tibble(input = csvFormatOfEachRule,
+    resultTibble = tibble::tibble(input = csvFormatOfEachRule,
                           intermediateOutput = intermediateOutput,
                           output=outputDfForEachRule)
     
@@ -224,7 +224,7 @@ executeRulesOnDataset <- function(dataset, rules){
   # getting the required format to display output columns
   rulesList <- list()
   outputCols <- list()
-  outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x,
+  outputCols <-  purrr::map(colnames(dataset),function(x)paste0("output.put('",x,
                                                          "',input.get('",x,
                                                          "'));"))
   # defining lists which can be used later on when the function, getRuleInDrl
@@ -235,8 +235,8 @@ executeRulesOnDataset <- function(dataset, rules){
   outputWithAllRows <- list()
   outputDfForEachRule <- list()
   # running the loop to get drl format for all the rules
-  rules %>% mutate(ruleNum = 1:nrow(.)) -> rules
-  rules %>% rowwise(.) %>% do(getRuleInDrl(.)) -> resultTib
+  rules %>% dplyr::mutate(ruleNum = 1:dplyr::n()) -> rules
+  rules %>% dplyr::rowwise() %>% dplyr::do(getRuleInDrl(.data)) -> resultTib
   inp <- resultTib$input    
   interOut <- resultTib$intermediateOutput
   op <- resultTib$output
@@ -360,7 +360,7 @@ runRulesDrl<-function(rules.session,input.df) {
 getConditionForMultiGroupBy <- function(groupByColumn, aggregationFunc, 
                                         aggregationColumn){
   
-  ruleCondition <-   map(groupByColumn,function(groupByColumn){
+  ruleCondition <-   purrr::map(groupByColumn,function(groupByColumn){
     #making groupby condition if there are multiple groupby
     groupByColumn <- unlist(strsplit(unlist(groupByColumn),","))
     groupByCondition <- paste0(groupByColumn,'==input.get("',groupByColumn,'")')
@@ -402,8 +402,8 @@ getrequiredColumns <- function(dataset,rules){
   valueColumns <- lapply(1:nrow(rules), function(rulesRowNumber){
     valueColumns[rulesRowNumber] <- paste0("Rule", rulesRowNumber, "Value")
   })
-  input.columns %>% append(.,list(output.columns)) %>% 
-    append(.,list(valueColumns)) -> output.columns 
+  input.columns %>% append(list(output.columns)) %>% 
+    append(list(valueColumns)) -> output.columns 
   
   return(list(input.columns=input.columns,
               output.columns=unlist(output.columns)))
@@ -484,10 +484,10 @@ getDrlForFilterRules <- function(dataset, rules, ruleNum, outputCols,
     "\tthen")
   
   drlRules <- append(drlRules,compDrl)
-  drlRules%>%append(.,outputCols)%>%append(.,list(outputforFilterComp))%>%
-    append(.,paste0("output.put('",ruleValue,"',",
-                    shQuote(paste("Not",filterCond)),");"))%>%
-    append(.,'end') -> drlRules
+  drlRules %>% append(outputCols) %>% append(list(outputforFilterComp)) %>%
+    append(paste0("output.put('",ruleValue,"',",
+                    shQuote(paste("Not",filterCond)),");")) %>%
+    append('end') -> drlRules
 
   filteredOutputSession <- rulesSessionDrl(drlRules, input.columns, 
                                            output.columns=output.columns)
@@ -528,15 +528,15 @@ ruleToCompareColumns <- function(dataset, rules, ruleNum){
     compareCondition,
     'then'
   )
-  outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",x, "',
+  outputCols <-  purrr::map(colnames(dataset),function(x)paste0("output.put('",x, "',
                                                          result.get('",x,"'));"))
   
   drlRules <-  append(drlRules, outputCols)
   ruleValue <- paste0("Rule", ruleNum, "Value")  
-  drlRules%>%append(., paste0("output.put(\"Rule", 
-                              ruleNum,"\"",", \"\"+","\"true\"",");"))%>%
-    append(.,paste0("output.put(",shQuote(ruleValue),",result);")  )%>%
-    append(.,'end') -> drlRules
+  drlRules %>% append(paste0("output.put(\"Rule", 
+                              ruleNum,"\"",", \"\"+","\"true\"",");")) %>%
+    append(paste0("output.put(",shQuote(ruleValue),",result);")  ) %>%
+    append('end') -> drlRules
   
   return(drlRules)
   
@@ -567,13 +567,13 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
   if(groupByColumn!=""){
     
     #getting the first and last row for each group
-    outputFormatted <-  eval(parse(text=paste('outputDf%>%group_by(',
-                                              groupByColumn,')%>%
-                                              slice(c(1,n()))%>%ungroup()')))  
+    outputFormatted <-  eval(parse(text=paste('outputDf %>% dplyr::group_by(',
+                                              groupByColumn,') %>% 
+                                              dplyr::slice(c(1,dplyr::n())) %>% dplyr::ungroup()')))  
     #getting the last row for each group
-    outputDfForEachRule <- eval(parse(text=paste('outputDf%>%
-                                                 group_by(', groupByColumn, ')%>%
-                                                 slice(c(n()))%>%ungroup()')))
+    outputDfForEachRule <- eval(parse(text=paste('outputDf %>% 
+                                                 dplyr::group_by(', groupByColumn, ') %>% 
+                                                 dplyr::slice(c(dplyr::n())) %>% dplyr::ungroup()')))
     #adding new column, Indices
     groupByColumn <-unlist(strsplit(groupByColumn,","))
     outputDf<- outputDfForEachRule[,c(groupByColumn,ruleName,ruleValue)]
@@ -597,7 +597,7 @@ formatOutput <- function(dataset, outputDf, rules, filteredDataFalse,
       if(aggregationFunc != "compare" && aggregationFunc != ""){
         # agg on whole column  
         # getting the last row
-        outputFormatted <- as_tibble(outputDf)%>%slice(n())
+        outputFormatted <- tibble::as_tibble(outputDf) %>% dplyr::slice(dplyr::n())
         
         ifelse(outputFormatted[,ruleName][1,]=='true',
                outputDf[c(1:nrow(outputDf)), ruleName] <-"true",
@@ -666,7 +666,7 @@ getDrlForRowwiseRules <- function(dataset, rules, ruleNum, input.columns,
   aggregationColumn <- rules[ruleNum,"Column"]
   operation <-  rules[ruleNum,"Operation"]
   argument <- rules[ruleNum,"Argument"]
-  outputCols <-  map(colnames(dataset),function(x)paste0("output.put('",
+  outputCols <-  purrr::map(colnames(dataset),function(x)paste0("output.put('",
                                                          x, "',
                                                          result.get('",x,"'));"))
   
@@ -682,8 +682,8 @@ getDrlForRowwiseRules <- function(dataset, rules, ruleNum, input.columns,
                     inCondition,
                     "\tthen")
   drlRules <- append(drlRules,outputCols)
-  drlRules%>%append(.,paste0("output.put(\"Rule",ruleNum,
-                             "\"",", \"\"+","\"true\"",");"))%>%
-    append(.,'end')->drlRules
+  drlRules %>% append(paste0("output.put(\"Rule",ruleNum,
+                             "\"",", \"\"+","\"true\"",");")) %>%
+    append('end') -> drlRules
   return(drlRules)  
 }
