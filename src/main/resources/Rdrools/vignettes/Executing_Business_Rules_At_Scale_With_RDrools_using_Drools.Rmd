@@ -40,7 +40,7 @@ options(stringsAsFactors = F)
 The Rdrools package aims to accomplish two main objectives:
 
 * Allow data scientists an intuitive interface to **execute business rules on datasets for the purpose of analysis or designing intelligent systems**, while leveraging the Drools rule engine
-* Provide a direct interface to *Drools* for executing all types of rules defined in *Drools* *.drl* format 
+* Provide a direct interface to *Drools* for executing all types of rules defined in the *Drools* *.drl* format 
 
 ## The advantages of a rule engine
 
@@ -55,11 +55,12 @@ RDrools brings the efficiencies of large-scale production rule systems to data s
 ## Executing rules on a dataset
 
 In order to achieve the objective of providing data scientists an intuitive interface to execute rules on datasets, the Rdrools package exposes the *executeRulesOnDataset* function, which is explicitly designed for data scientists. As input to this function rules are defined using the typical language of data science with verbs such as
-* *filter*
-* *group by*
-* *aggregate*
 
-For ease of use, the rules can be defined in a *csv* format, with a familiar structure using the verbs discussed earlier. We take the example of the iris dataset and define rules on it. The sample rules for the iris dataset are defined in the *irisRules* data object [for the purpose of the example]
+* filter
+* group by
+* aggregate
+
+For ease of use, the rules can be defined in a *csv* format and imported into the R session through the usual read functions. The require format follows a familiar structure using the verbs discussed earlier. We take the example of the iris dataset and define rules on it. The sample rules for the iris dataset are defined in the *irisRules* data object [for the purpose of the example]
 
 ```{r}
 data("iris")
@@ -72,33 +73,10 @@ sampleRules
 
 Through this function, various typical types of rules can be executed with a combination of the **verbs** described above.
 
-### Applying a simple filter
+Note - In order to plot graphs to show counts of number of facts passing/ failing rules, we have defined a function internal to the vignette to plot graphs called 'plotgraphs'
 
-The first type of rule is applying a simple filter based on the condition on a particular column. This is done by specifying the full condition under the filter column.
 
-In the case of the **iris** dataset, we filter out a specific type of *Species*. To illustrate this case, we apply only rule 1.
-
-```{r,comment=NA}
-filterRule <- sampleRules[1,]
-filterRuleOutput <- executeRulesOnDataset(iris, filterRule)
-str(filterRuleOutput)
-```
-
-The output has three objects:  
-
-* **input**: has the rule defined  by the user in a data frame
-* **intermediateOutput** :  intermediate output is an empty list as there is no aggregation
-* **output**: has the output data frame with 3 columns:
-    * **Group**: the above rule has no group by and hence the rule is applied row-wise. Group, in this case, represents the row number
-    * **Indices**: the row numbers of the data frame
-    * **IsTrue**: flag to say if the data point is satisfying the rule or not. IN this case, Flag is *true* if the Species is setosa and *false* if it's not setosa
-    
-    
-**Plotting graphs of the result obtained**
-
-The output obtained can be visualized by plotting the graphs of the distribution of true and false in the output. *true* here represents the points which satisfy the rule i.e *Species=setosa* and false represents the points which are not setosa.
-
-```{r, warning=FALSE,message=FALSE}
+```{r, warning=FALSE,message=FALSE, echo=FALSE}
 #' Vignette helper functions
 #' @description: Function plot graphs in the vignette
 #' -----------------------------------------------------------------------------
@@ -163,7 +141,32 @@ plotgraphs <- function(result,plotName){
   }
 }
 ```
+
+### Applying a simple filter
+
+The first type of rule is applying a simple filter based on the condition on a particular column. This is done by specifying the full condition under the filter column.
+
+In the case of the **iris** dataset, we filter out a specific type of *Species*. To illustrate this case, we apply only rule 1.
+
+```{r,comment=NA}
+filterRule <- sampleRules[1,]
+filterRule
+filterRuleOutput <- executeRulesOnDataset(iris, filterRule)
+str(filterRuleOutput)
 ```
+
+The output has three objects:  
+
+* **input**: has the rule defined  by the user in a data frame
+* **intermediateOutput**: is an empty list as there is no grouped aggregation
+* **output**: has the output data frame with 3 columns:
+    * **Group**: the above rule has no group by and hence the rule is applied row-wise. Group, in this case, represents the row number
+    * **Indices**: the row numbers of the data frame
+    * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the *Species* is *setosa* and *false* if not
+    
+**Plotting graphs of the result obtained**
+
+The output obtained can be visualized by plotting the graphs of the distribution of true and false in the output. *true* here represents the points which satisfy the rule i.e *Species = setosa* and *false* represents the points which do not.
 
 ```{r}
 anomaliesCountGraph <- plotgraphs(result=filterRuleOutput, plotName="Plot of points distribution")
@@ -178,6 +181,7 @@ To illustrate this case, we apply only rule 2 from the set of sample rules.
 
 ```{r,comment=NA}
 groupedAggregationRule <- sampleRules[2,]
+groupedAggregationRule
 groupedAggregationRuleOutput <- executeRulesOnDataset(iris, groupedAggregationRule)
 str(groupedAggregationRuleOutput)
 ```
@@ -185,11 +189,11 @@ str(groupedAggregationRuleOutput)
 The output has three objects:
   
 * **input**: has the rule defined  by the user in a data frame
-* **intermediateOutput** :has group (groupby column) and it's corresponding flag (true/false)
+* **intermediateOutput**: has group (group by column) and it's corresponding flag (true/false)
 * **output**: has the output data frame with 3 columns:
-    * **Group**: the above rule has a group by and hence the rule is applied to each group. Group, in this case, represents the column grouped by, Species
-    * **Indices**: the row numbers of each group
-    * **IsTrue**: flag to say if the data point is satisfying the rule or not. IN this case, Flag is *true* if the aggregated value is greater than or equal to .5.9 and *false* if it's not
+    * **Group**: the above rule has a group by condition and hence the rule is applied to each group. Group, in this case, represents the values of the column on which the group by condition was applied i.e. *Species*
+    * **Indices**: the row numbers form the dataset present in each group
+    * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the aggregated value of the group is greater than or equal to the threshold value and *false* if it's not
 
 **Plotting graphs of the result obtained**
 
@@ -199,6 +203,8 @@ anomalousSetGraph[[1]][[1]]
 ```
 
 The above graph shows the groups i.e, the *Species* for which the average of *Sepal.Length* is greater than or equal to 5.9. The Y-axis shows the average *Sepal.Length* for each *Species*.
+
+The plot below shows the number of **groups** which satisfied the rule. As we can see from above, 2 of the 3 groups satisfy the rule, and hence *true* has a count of 2.
 
 ```{r, warning=FALSE,message=FALSE}
 anomaliesCountGraph<-plotgraphs(result=groupedAggregationRuleOutput, plotName="Plot of points distribution")
@@ -214,6 +220,7 @@ To illustrate this case, we apply only rule 3 from the set of sample rules.
 
 ```{r,comment=NA}
 columnAggregationRule <- sampleRules[3,]
+columnAggregationRule
 columnAggregationRuleOutput <- executeRulesOnDataset(iris, columnAggregationRule)
 str(columnAggregationRuleOutput)
 ```
@@ -221,11 +228,11 @@ str(columnAggregationRuleOutput)
 The output has three objects:
 
 * **input**: has the rule defined  by the user in a data frame
-* **intermediateOutput** :  intermediate output is an empty list as there is no aggregation
+* **intermediateOutput**: is an empty list as there is no grouped aggregation
 * **output**: has the ****output**** data frame with 3 columns:
     * **Group**: the above rule has no group by and no filter. The rule is applied to the whole column. Group, in this case, represents the whole column
     * **Indices**: the row numbers of the whole data frame
-    * **IsTrue**: flag to say if the data point is satisfying the rule or not. IN this case, Flag is *true* if the aggregated value is greater than 5 and *false* if it's not
+    * **IsTrue**: flag to say if the data point is satisfying the rule or not. IN this case, Flag is *true* if the aggregated value is greater than the threshold value and *false* if not
 
 ### Applying a filter with aggregation
 
@@ -235,6 +242,7 @@ To illustrate this case, we apply only rule 4 from the set of sample rules.
 
 ```{r,comment=NA}
 filterColAggregationRule <- sampleRules[4,]
+filterColAggregationRule
 filterColAggregationRuleOutput <- executeRulesOnDataset(iris, filterColAggregationRule)
 str(filterColAggregationRuleOutput)
 ```
@@ -242,20 +250,21 @@ str(filterColAggregationRuleOutput)
 The output has three objects:
 
 * **input**: has the rule defined  by the user in a data frame
-* **intermediateOutput** :  intermediate output is an empty list as there is no aggregation
+* **intermediateOutput**:  is an empty list as there is no grouped aggregation
 * **output**: has the output data frame with 3 columns:
     * **Group**: the above rule has no group by and hence the rule is applied to the whole column after filtering the data. Group, in this case, represents the whole column 
-    * **Indices**: the row numbers of the whole data frame
+    * **Indices**: the row numbers of the filtered data frame on applying the condition
     * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the aggregated value of the filtered data is greater than or equal to 5  and *false* if it's not
     
 ### Applying a filter with grouped aggregation
 
-We now combine all types if verbs into one rule. In *iris* dataset, we check if for all cases with *Petal.Width* greater than a threshold value, if each type of *Species* [which is a group] has an average *Petal.Length* greater than another threshold.
+We now combine all types if verbs into one rule. In the *iris* dataset, we check if for all cases with *Petal.Width* greater than a threshold value, if each type of *Species* [which is a group] has an average *Petal.Length* greater than another threshold.
 
 To illustrate this case, we apply only rule 5 from the set of sample rules.
 
 ```{r,comment=NA}
 filterGroupByAggrRule <- sampleRules[5,]
+filterGroupByAggrRule
 filterGroupByAggrRuleOutput <- executeRulesOnDataset(iris, filterGroupByAggrRule)
 str(filterGroupByAggrRuleOutput)
 ```
@@ -263,11 +272,11 @@ str(filterGroupByAggrRuleOutput)
 The output has three objects:
 
 * **input**: has the rule defined  by the user in a data frame
-* **intermediateOutput** : has group (groupby column) and it's corresponding flag (true/false)
+* **intermediateOutput**: has the groups (group by column) and their corresponding flag (true/false)
 * **output**: has the output data frame with 3 columns:
-    * **Group**: the above rule has a group by and filter. Hence the rule is applied to each group after filtering the data. Group, in this case, represents the grouped by column, Species
-    * **Indices**: the row numbers of the each group
-    * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the aggregated value of the filtered data is less than or equal to 5  and *false* if it's not
+    * **Group**: the above rule has a group by and filter. Hence the rule is applied to each group after filtering the data. Group, in this case, represents the grouped by column i.e. *Species*
+    * **Indices**: the row numbers of the data frame present in each group after filtering
+    * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the aggregated value for the group after filtering is less than or equal to the threshold  and *false* if not
 
 
 ```{r, warning=FALSE,message=FALSE}
@@ -276,6 +285,7 @@ anomalousSetGraph[[1]][[1]]
 ```
 
 The above graph shows the groups i.e, the *Species* for which the average of *Petal.Length* is less than 5. The Y-axis shows the average *Petal.Length* for each *Species*.
+
 ### Applying a condition to compare columns
 
 Here we compare values of two columns. In the case of the **iris** dataset, we compare the *Petal.Length* with *Sepal.Width*, and identify the *rows* which have a *Petal.Length* greater than *Sepal.Width*. 
@@ -284,6 +294,7 @@ To illustrate this case, we apply only rule 6 from the set of sample rules.
 
 ```{r,comment=NA}
 compareColumnsRule <- sampleRules[6,]
+compareColumnsRule
 compareColumnsRuleOutput <- executeRulesOnDataset(iris, compareColumnsRule)
 str(compareColumnsRuleOutput)
 ```
@@ -291,11 +302,11 @@ str(compareColumnsRuleOutput)
 The output has three objects:
 
 * **input**: has the rule defined  by the user in a data frame
-* **intermediateOutput** : intermediate output is an empty list as there is no aggregation
+* **intermediateOutput**: is an empty list as there is no aggregation
 * **output**: has the output data frame with 3 columns:
     * **Group**: the above rule has no group by and filter. Hence the rule is applied to each row. Group, in this case, represents the row
-    * **Indices**: the row numbers of the each group
-    * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the *Petal.Length* greater than *Sepal.Width*   and *false* if it's not
+    * **Indices**: each row number
+    * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the *Petal.Length* greater than *Sepal.Width* and *false* if not
 
 ```{r, warning=FALSE,message=FALSE}
 anomaliesCountGraph<-plotgraphs(result=compareColumnsRuleOutput, plotName="Plot of points distribution")
@@ -306,10 +317,11 @@ anomaliesCountGraph[[1]][[1]]
 
 Here we compare values of two columns after filtering the dataset. In the case of the **iris** dataset, we compare the *Petal.Length* with *Sepal.Width*, and identify the *rows* which have a *Petal.Length* greater than *Sepal.Width*. 
 
-To illustrate this case, we apply only rule 6 from the set of sample rules.
+To illustrate this case, we apply only rule 7 from the set of sample rules.
 
 ```{r,comment=NA}
 compareFilterRule <- sampleRules[7,]
+compareFilterRule
 compareFilterRuleOutput <- executeRulesOnDataset(iris, compareFilterRule)
 str(compareFilterRuleOutput)
 ```
@@ -317,11 +329,11 @@ str(compareFilterRuleOutput)
 The output has three objects:
 
 * **input**: has the rule defined  by the user in a data frame
-* **intermediateOutput** : intermediate output is an empty list as there is no aggregation
+* **intermediateOutput**: is an empty list as there is no aggregation
 * **output**: has the output data frame with 3 columns:
-    * **Group**: the above rule has no group by. Hence the rule is applied to each row. Group, in this case, represents the row
-    * **Indices**: the row numbers of the each group
-    * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the *Petal.Length* of *Versicolor* species is greater than *Sepal.Width*   and *false* if it's not
+    * **Group**: the above rule has no group by condition. Hence the rule is applied to each row. Group, in this case, represents the row
+    * **Indices**: each row number
+    * **IsTrue**: flag to say if the data point is satisfying the rule or not. In this case, Flag is *true* if the *Petal.Length* of *Versicolor* species is greater than *Sepal.Width* and *false* if not
 
 ```{r, warning=FALSE,message=FALSE}
 anomaliesCountGraph<-plotgraphs(result=compareColumnsRuleOutput, plotName="Plot of points distribution")
@@ -330,11 +342,13 @@ anomaliesCountGraph[[1]][[1]]
 
 # Use case
 
+We now consider a more business-specific problem, where such a rule system might be deployed.
+
 ## Problem statement
 
-Consider the customers of a retail bank, who make transactions against their bank account for different purposes such as shopping, money transfers, etc. In the banking system, there is a huge potential for fraud, with abnormal transaction behavior indicative of this. 
+Consider the customers of a retail bank, who make transactions against their bank account for different purposes such as shopping, money transfers, etc. In the banking system, there is a huge potential for fraud. Typically, abnormal transaction behavior is a strong indicator of fraud.
 
-We explore how such transactions can be monitored intelligently to detect fraud using Rdrools by applying business rules.
+We explore how such transactions can be monitored intelligently to detect fraud using **Rdrools** by applying business rules.
 
 ## Details of the dataset 
 
@@ -349,7 +363,7 @@ The following dataset provides transaction data for multiple customers of the re
   + *Total transactions*: number of transactions done by the customer in each month and the cumulative number of transactions
 
 ```{r,warning=FALSE}
-data(transactionData)
+data("transactionData")
 transactionData$Date <- lubridate::ymd(transactionData$Date)
 transactionData <- transactionData[1:500,]
 ```
@@ -378,10 +392,10 @@ In our case we check rules like:
 
 
   + If the number of transactions done by the customer in a month exceeds more than 20 then the customer can be fraudulent
-  + If the transaction amount exceeds the more than a threshold then the account can be fraudulent
+  + If the transaction amount exceeds the more than a threshold then it might be a fraudulent transaction
   
 ```{r,comment=NA}
-data(transactionRules)
+data("transactionRules")
 rownames(transactionRules) <- seq(1:nrow(transactionRules))
 transactionRules[is.na(transactionRules)]    <-""
 transactionRules
@@ -394,7 +408,8 @@ $$\textsf{For an account, the total Transaction_Amount } \\  \textsf{should be g
 
 ## Executing rules on the dataset
 
-The rules can be executed on the transaction data as follows.
+We now take the entire set of rules and execute it on the transaction data as follows:
+
 ```{r}
 transactionDataOutput  <- executeRulesOnDataset(transactionData, transactionRules)
 ```
@@ -405,18 +420,18 @@ transactionDataOutput  <- executeRulesOnDataset(transactionData, transactionRule
 length(transactionDataOutput)
 str(transactionDataOutput[[5]]) #Rule 5 output
 ```
- Let us take the results obtained for *Rule5* to understand the applications of Rdrools. The *Rule5* was
+Let us take the results obtained for *Rule5* to understand the applications of Rdrools. *Rule 5* was
 
-$$\textsf{For an account, the maximum of Transaction_Amount } \\  \textsf{should be greater than or equal to USD 40,000 for all the debit transactions done after 2017-05-01}$$ 
+$$\textsf{For a fraudulent/ anomalous account, the maximum of Transaction_Amount } \\  \textsf{should be greater than or equal to USD 40,000 for all the debit transactions done after 2017-05-01}$$ 
+
 The output has three objects:
 
 * **input**: has the rule defined  by the user in a data frame
-* **intermediateOutput** : intermediate output especially in case of sequential rules
+* **intermediateOutput**: has the groups (group by column) and their corresponding flag (true/false)
 * **output**: has the output data frame with 3 columns:
-    * **Group**: 
-    The rule says to find the transactions done by each *Account_ID*, which implies that the data is to be grouped by *Account_Id*. Hence group here represents the *Account_ID*.
-    * **Indices**: the row numbers of the data frame under each *Account_ID* 
-    * **IsTrue**: flag to say if the *Account_ID* is anomalous or not. 
+    * **Group**: In this rule, we want to aggregate transaction behaviour at an account level. Hence group here represents the *Account_ID*.
+    * **Indices**: the row numbers of the data frame under each *Account_ID* i.e. the row numbers of the transactions against each account
+    * **IsTrue**: flag to say if the *Account_ID* is fraudulent or not. 
 
 ## Plotting graphs of the result obtained
 
