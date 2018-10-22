@@ -8,3 +8,5 @@ target/*
 .DS_Store
 .classpath
 .settings/*
+.vscode/*
+.vscode
